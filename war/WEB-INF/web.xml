@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+	<servlet>
+		<servlet-name>Vue</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.VueServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Vue</servlet-name>
+		<url-pattern>/vue</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>ArtistInput</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.ArtistInputServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ArtistInput</servlet-name>
+		<url-pattern>/artistinput</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>Contact</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.ContactServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Contact</servlet-name>
+		<url-pattern>/contact</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>GetArtistsCloud</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.GetArtistsCloudServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetArtistsCloud</servlet-name>
+		<url-pattern>/getartistscloud</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>SaveCrazySnake</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.SaveCrazySnakeServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SaveCrazySnake</servlet-name>
+		<url-pattern>/savecs</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>GetCrazySnake</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.GetCrazySnakeServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetCrazySnake</servlet-name>
+		<url-pattern>/getcs</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>GetCrazySnakeList</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.GetCrazySnakeListServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetCrazySnakeList</servlet-name>
+		<url-pattern>/getcslist</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>GetTopTrackPreviewUrl</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.GetTopTrackPreviewUrl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetTopTrackPreviewUrl</servlet-name>
+		<url-pattern>/gettoptrackpreviewurl</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>AMGProxyServlet</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.AMGProxyServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AMGProxyServlet</servlet-name>
+		<url-pattern>/amgproxy</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>GetAdmin</servlet-name>
+		<servlet-class>com.rache.isoartistictree.servlet.GetAdminServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>GetAdmin</servlet-name>
+		<url-pattern>/admin/admin</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>SystemServiceServlet</servlet-name>
+		<servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
+		<init-param>
+			<param-name>services</param-name>
+			<param-value/>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SystemServiceServlet</servlet-name>
+		<url-pattern>/_ah/spi/*</url-pattern>
+	</servlet-mapping>
+ 
+    <security-constraint>
+        <web-resource-collection>
+        	<web-resource-name>AdminResource</web-resource-name>
+            <url-pattern>/admin/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+ 
+	 <mime_mapping>
+			<extension>webapp</extension>
+			<mime-type>application/x-web-app-manifest+json</mime-type>
+	 </mime_mapping>
+    
+</web-app>

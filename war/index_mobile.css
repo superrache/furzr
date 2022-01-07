@@ -1,0 +1,306 @@
+body{
+  margin:0;
+  padding:0;
+  width: 100%;
+  height: 100%;
+  font-family:Tahoma,Helvetica, sans-serif;
+  font-size:1em;
+  color: #3E454C;
+  background-color: rgba(255, 255, 255, 1);
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+a {
+	color: #2572B8;
+}
+
+a:hover {
+	color: white;
+	background-color: #00B3FF;
+}
+
+input, textarea {
+    color: #3E454C;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(226, 226, 226, 0.8);
+    border-radius: 2px;
+    width: 97%;
+    padding: 2px 3px;
+}
+
+textarea:focus, input:focus {
+    color: #3E454C;
+    background-color: rgba(255, 255, 255, 0.8);
+    outline: none;
+}
+
+.div_options {
+	background-color: rgba(255, 255, 255, 1);
+	padding: 5px;
+}
+
+.div_options:hover {
+	background-color: #00B3FF;
+	color: white;
+	cursor: default;
+}
+
+.span_bull {
+	color: #00B3FF;
+}
+
+h1 {
+	font-family:Tahoma, sans-serif;
+	font-size: 2.5em;
+	color: #00B3FF;
+	text-shadow:2px 1px 2px #2572B8;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+h2 {
+	font-size: 1.4em;
+	color: #00B3FF;
+	text-shadow:1px 0.5px 1px #2572B8;
+	margin: 0;
+	padding: 0;
+}
+
+h3 {
+	font-size: 1em;
+	font-weight: bold;
+	margin-left: 0;
+	margin-right: 0;
+	margin-top: 0;
+	margin-bottom:5px;
+	padding: 0;
+}
+
+.floating_div {
+	padding: 0px;
+	margin: 0px;
+	background-color: rgba(226, 226, 226, 0.8);
+}
+
+#div_input_artist_center {
+	padding-bottom:5px;
+}
+
+#div_input_artist .buttonclass {
+	float: right;
+	margin-top:1px;
+	margin-right:5px;
+}
+
+#div_input_artist span {
+	display: block;
+	overflow: hidden;
+}
+
+#div_voile {
+	display:none;
+}
+
+#div_more {
+	padding: 5px;
+	margin: 0px;
+	background-color: rgba(226, 226, 226, 0.8);
+}
+
+#div_more_titre {
+	display: none;
+}
+
+header {
+	background-color:rgba(226, 226, 226, 0.8);
+}
+
+#div_about {
+	text-align: justify;
+}
+
+#div_contact_send {
+	text-align: right;
+}
+
+#div_contact_message_sent {
+	display:none;
+}
+
+.separateur {
+	border: 2px solid white;
+	border-radius: 2px;
+	margin: 3px;
+	padding: 5px;
+}
+
+.gros_input {
+	font-size: 1.05em;
+	font-weight: bold;
+}
+
+#canvas {
+	display: block;
+	z-index: 1;
+}
+
+#canvas.linkable{
+  cursor:pointer;
+}
+
+.buttonclass {
+	background-color:white;
+	display:inline-block;
+	font-weight:normal;
+	margin-top: 0px;
+	padding:3px 12px;
+	text-decoration:none;
+	border-radius: 2px;
+}.buttonclass:hover {
+	background-color: #00B3FF;
+	color: white;
+	cursor: default;
+}
+
+.tooltip {
+	display:none;
+}
+
+.tooltip_error {
+	background-color: rgba(255, 160, 160, 1);
+}
+
+#div_crazy_snake {
+	padding: 5px;
+	margin: 0px;
+	background-color: rgba(226, 226, 226, 0.8);
+}
+
+#div_cs_titre {
+	text-align: center;
+}
+
+#div_cs_content {
+
+}
+
+#div_cs_save_form {
+	display: none;
+}
+
+#spinner_cs_save_form {
+	display: none;
+}
+
+#div_cs_saved {
+	display: none;
+}
+
+#div_cs_share {
+	display: none;
+}
+
+#div_cs_url {
+	border: 2px solid #00B3FF;
+	color: #00B3FF;
+}
+
+#div_cs_popular_list_scroll {
+	overflow: auto;
+	height: 220px;
+	background-color: white;
+}
+
+.cs_popular_list_element {
+	background-color: white;
+	color: black;
+}
+
+.cs_popular_list_element:hover {
+	background-color: #00B3FF;
+	color: white;
+	cursor: default;
+}
+
+.button_cs_popular_list_element_load {
+	text-decoration:underline;
+	float:right;
+	position: relative;
+	margin: 5px;
+}
+
+.button_cs_popular_list_element_load:hover {
+	color: #2572B8;
+	background-color: white;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.span_cs_popular_list_element_name {
+	font-weight: bold;
+}
+
+.span_cs_popular_list_element_nickname {
+	font-style: italic;
+}
+
+#div_other_social_share {
+	margin-bottom: 5px;
+}
+
+.span_social_share {
+	margin: 2px;
+}
+
+.span_social_share:hover {
+	cursor:pointer;cursor:hand;
+}
+
+#div_donate_paypal {
+	width: 74px;
+}
+
+#div_artist_overview {
+	display:none;
+	text-align: justify;
+	padding: 5px;
+	background-color: rgba(226, 226, 226, 0.8);
+}
+
+#div_artist_overview_detail {
+	margin:5px;
+}
+
+#div_artist_overview_image {
+	float:left;
+	margin-right:5px;
+}
+
+#span_artist_overview_tags {
+	color:#2572B8;
+}
+
+#button_sound_volume {
+	display:none;
+	float:right;
+	height:23px;
+	padding:0;
+}
+
+#button_sound_volume img {
+	padding-top:1px;
+	padding-left:2px;
+	padding-right:3px;
+}
+
+#div_bottom_left_tools {
+	padding-top:5px;
+	padding-left:5px;
+}
+
+#div_bottom_ad {
+	display:none;
+}
+

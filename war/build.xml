@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<project basedir="." default="compile">
+    <target name="compile">
+        <java jar="compiler.jar" fork="true">
+        	<arg line="--js debug/jquery.md5.min.js"/>
+        	<arg line="--js debug/furzr-utils.js"/>
+        	<arg line="--js debug/furzr-preview-seven-digital.js"/>
+        	<arg line="--js debug/furzr-dao-lastfm.js"/>
+        	<arg line="--js debug/furzr-dao-amg.js"/>
+        	<arg line="--js debug/furzr-mediator.js"/>
+        	<arg line="--js_output_file furzr.min.js"/>
+        	<arg line="--jscomp_off=internetExplorerChecks"/>
+        </java>
+    </target>
+
+</project>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8"/>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+    
+    <meta property="og:title" content="furzr"/>
+    <meta property="og:description" content="Furzr offers a new way to explore the world of music, browsing relationships between artists and listening samples. This app lets you expand your musical knowledge and find out what you will be listening soon."/>
+	<meta property="og:type" content="website"/>
+	<meta property="og:url" content="http://www.furzr.net"/>
+	<meta property="og:image" content="http://www.furzr.net/img/furzr-logo-256.png"/>
+	<link rel="image_src" type="image/png" href="http://www.furzr.net/img/furzr-logo-256.png"/>
+    <meta property="fb:admins" content="1021901278" />
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="description" content="Furzr offers a new way to explore the world of music, browsing relationships between artists or bands and listening samples. This app lets you expand your musical knowledge like the leaves of a tree and find out what you will be listening soon."/>
+    
+    <title>furzr</title>
+    
+	<link rel="stylesheet" media="screen and (max-width: 640px)" href="index_mobile.css"/>
+	<link rel="stylesheet" media="screen and (min-width: 640px)" href="index.css"/>
+    
+    <script src="jquery-2.1.1.min.js"></script>
+    <script src="debug/jquery.md5.min.js"></script>
+	<script src="arbor.js"></script>
+	<script src="debug/furzr-utils.js"></script>
+	<script src="debug/furzr-preview-seven-digital.js"></script>
+	<script src="debug/furzr-dao-lastfm.js"></script>
+	<script src="debug/furzr-dao-amg.js"></script>
+	<script src="debug/furzr-dao-spotify.js"></script>
+	<script src="debug/furzr-mediator.js"></script>
+
+	<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-39312400-1', 'auto');
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
+
+</script>
+
+  </head>
+
+  <body>
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&status=0";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+	
+  	<header class="state_header_normal">
+  		<div id="div_header_center">
+  			<h1>furzr</h1>
+  		</div>
+  	</header>
+  	
+	<div id="div_input_artist" class="state_div_input_artist_normal">
+		<div id="div_input_artist_center" class="floating_div">
+			<div id="button_sound_volume" class="buttonclass">
+			</div>
+			<div id="button_artist" class="buttonclass">
+				Add
+			</div>
+			<span>
+				<input id="input_artist" class="gros_input" type="text" placeholder="Give a music artist name here" autocomplete="off"/>
+			</span>
+		</div>
+	</div>
+	
+	<canvas id="canvas" width="800" height="400"></canvas>
+
+	<div id="div_bottom_ad" class="floating_div">
+		<div id="pub_bottom">
+			<script type="text/javascript" src="http://www.cpmaffiliation.com/38565-468x60.js"></script>
+		</div>
+		<div id="button_close_pub" class="buttonclass">
+			x
+		</div>
+	</div>
+	
+	<div id="div_bottom_left_tools" class="floating_div">
+		<div id="button_clear" class="buttonclass">
+			Clear the map
+		</div>
+	</div>
+	
+	<div id="div_artist_overview" class="floating_div">
+		<h2 id="h3_artist_overview_name"></h2>
+
+		<div id="div_sound_preview">
+			<div id="div_sound_title"></div>
+			<audio id="audio_artist_overview_preview" hidden="true" autoplay="autoplay" src=""></audio>
+		</div>
+
+		<div id="div_artist_overview_detail">
+			<div id="div_artist_overview_image">
+				<a id="a_artist_overview_lien" href="http://lastfm.com" target="_blank">
+					<img id="img_artist_overview_image" src="" height=126>
+				</a>
+			</div>
+			<span id="span_artist_overview_tags"></span>
+			<br/>
+			<span id="span_artist_overview_description"></span>
+		</div>
+	</div>
+	
+	<div id="div_crazy_snake">
+		
+		<div id="div_cs_titre">
+			<h2>Share this map</h2>
+		</div>
+		
+		<div id="div_cs_content">
+			<div id="div_cs_share" class="separateur">
+					<h3 id="h_cs_share_title"></h3>
+					This artist map is directly accessible from the following URL
+					<input id="div_cs_url" onClick="this.select();" class="gros_input"></input>
+					Copy this URL to share it!
+			</div>
+			
+			<div id="div_this_snake" class="separateur">
+				<h3 id="h_snake_description"></h3>
+				<div id="button_cs_save" class="buttonclass">Save and share</div>
+				
+				<div id="div_cs_save_form">
+					<input id="input_cs_name" class="gros_input" type="text" placeholder="Give a name to your map"/>
+					<input id="input_cs_pseudo" class="gros_input" type="text" placeholder="Your nickname (optional)"/>
+					<div id="button_cs_save_form" class="buttonclass">Save</div>
+					<div id="spinner_cs_save_form"></div>
+				</div>
+				
+				<div id="div_cs_saved"></div>
+				
+			</div>
+			
+			<div id="div_cs_popular_list" class="separateur">
+				<h3 id="h_cs_popular_list">Find out what others shared</h3>
+				
+				<div id="div_cs_popular_list_scroll">
+					
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	<div id="div_more">
+		<div id="div_more_content">
+			<div id="div_about" class="separateur">
+				<h3>About this app</h3>
+				<b>furzr</b> offers an original way to explore the world of music, browsing relationships between artists or bands and listening samples. This app lets you expand your musical knowledge like the leaves of a tree and find out what you will be listening soon.  
+				<br/><b>furzr</b> uses data from <a href="http://www.lastfm.com" target="_blank">last.fm</a>, <a href="http://www.7digital.com/" target="_blank">7digital</a> and <a href="http://www.rovicorp.com/" target="_blank">Rovi</a>.
+			</div>
+			<div id="div_contact" class="separateur">
+				<h3>Any suggestions, questions and comments are welcome</h3>
+		   		<input id="input_contact_email" class="gros_input" type="email" placeholder="Your email"/>
+		   		<br/>
+		   		<textarea id="input_contact_message" rows="4" type=text placeholder="Your message"></textarea>
+		   		<br/>
+		   		<div id="div_contact_send">
+			   		<div id="button_contact_send" class="buttonclass">Send</div>
+			   		<div id="div_contact_message_sent">Message sent</div>
+				</div>
+			</div>
+
+			<div id="div_share" class="separateur">
+				<h3>If you want to share this page</h3>
+				<div class="fb-like" data-href="http://furzr.net/" data-send="false" data-width="380" data-show-faces="false" data-font="tahoma"></div>
+				<div id="div_other_social_share">
+					<img class="span_social_share" data="facebook" src="/img/facebook.png" width=32 title="Share on Facebook"/>
+					<img class="span_social_share" data="twitter" src="/img/twitter.png" width=32 title="Share on Twitter"/>
+					<img class="span_social_share" data="plusone" src="/img/plusone.png" width=32 title="Share on Google+"/>
+					<img class="span_social_share" data="stumbleupon" src="/img/stumbleupon.png" width=32 title="Share on Stumbleupon"/>
+					<img class="span_social_share" data="linkedin" src="/img/linkedin.png" width=32 title="Share on LinkedIn"/>
+					<img class="span_social_share" data="delicious" src="/img/delicious.png" width=32 title="Share on Del.icio.us"/>
+					<img class="span_social_share" data="digg" src="/img/digg.png" width=32 title="Digg me"/>
+					<img class="span_social_share" data="reddit" src="/img/reddit.png" width=32 title="Submit to reddit"/>
+					<img class="span_social_share" data="pinterest" src="/img/pinterest.png" width=32 title="Pin it"/>
+					<img class="span_social_share" data="tumblr" src="/img/tumblr.png" width=32 title="Share on Tumblr"/>
+				</div>
+
+				<div>
+					<script type="text/javascript" src="http://www.cpmaffiliation.com/38565-300x250.js"></script>
+				</div>
+
+				Copyright 2014, furzr
+			</div>
+		</div>
+
+   		<div id="div_more_titre">
+   			<h1>furzr</h1>
+   		</div>
+   		
+	</div>
+	
+	<div id="tooltip_help_1" class="tooltip">
+		Click on an artist to expand the similarity map
+	</div>
+	
+	<div id="tooltip_help_2" class="tooltip">
+		Have fun and share your map!
+	</div>
+	
+	<div id="tooltip_service_unavailable_error" class="tooltip tooltip_error">
+		The service is temporarily unavailable, please reload the page and retry
+	</div>
+	
+	<div id="tooltip_no_similars_error" class="tooltip tooltip_error">
+		This artist doesn't have related artists
+	</div>
+	
+	<div id="tooltip_input_artist_unknown" class="tooltip tooltip_error">
+		There is no music artist known named like that, please try another
+	</div>
+	
+	<div id="div_voile"></div>
+	
+  </body>
+	 
+</html>

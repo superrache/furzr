@@ -1,0 +1,23 @@
+﻿{
+  "name": "Furzr",
+  "description": "Furzr is a new way to explore the world of music, browsing relationships between artists and listening samples. This app lets you expand your musical knowledge and find out what you will be listening soon.",
+  "launch_path": "/",
+  "icons": {
+    "128": "/img/furzr-logo-128.png",
+    "256": "/img/furzr-logo-256.png",
+    "30": "/img/furzr-logo-30.png",
+    "32": "/img/furzr-logo-32.png",
+    "60": "/img/furzr-logo-60.png",
+    "64": "/img/furzr-logo-64.png"
+  },
+  "developer": {
+    "name": "Kevin Lecocq",
+    "url": "http://twitter.com/KevinLoufoque"
+  },
+  "default_locale": "en",
+  "locales": {
+  "fr": {
+    "description": "Furzr est une nouvelle façon d'explorer le monde de la musique, en parcourant les relations entre les artistes et en écoutant des extraits de leurs tubes. Cette application vous permet de développer vos connaissances musicales et ainsi découvrir ce que vous écouterez bientôt en boucle."
+  	}
+  }
+}

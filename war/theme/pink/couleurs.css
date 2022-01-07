@@ -1,0 +1,65 @@
+/*
+	Thème :
+	couleur orange pétant : FF6B00 ou 255, 107, 0
+	couleur bleu pétant : 2600FF ou 38, 0, 255
+	couleur vert pétant : 07B200 ou 7, 178, 0
+	couleur bleu clair : 9995B2 ou 153, 149, 178
+	couleur vert clair : 7BCC78 ou 123, 204, 120
+	noir : 303030
+*/
+
+/*
+	Autre thème :
+	gris : 62, 69, 76 ou 3E454C
+	bleu : 33, 133, 197 ou 2185C5
+	bleu/vert clair : 126, 206, 253 ou 7ECEFD
+	blanc cassé : 255, 246, 229 ou FFF6E5
+	rose : 255, 127, 102 ou FF7F66
+*/
+body {
+	color: #3E454C;
+	background-color: rgba(255, 255, 255, 1);
+}
+
+textarea:focus, input:focus {
+    color: #3E454C;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+input, textarea {
+    color: #3E454C;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(226, 226, 226, 0.8);
+}
+
+.div_options {
+	background-color: rgb(255, 255, 255, 0.8);
+}
+
+#div_modes:hover .div_options {
+	background-color: #FFFFFF;
+}
+
+#div_modes:hover .div_options:hover {
+	background-color: #E800D2;
+	color: white;
+	cursor: default;
+}
+
+.span_bull {
+	color: #E800D2;
+}
+
+h1 {
+	font-family:Tahoma, sans-serif;
+	font-size: 2em;
+	color: #E800D2;
+	text-shadow:2px 1px 2px #8E00FF;
+}
+
+h2 {
+	font-size: 1.4em;
+	color: #E800D2;
+	text-shadow:1px 0.5px 1px #8E00FF;
+}
+
