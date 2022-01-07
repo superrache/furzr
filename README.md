@@ -1,4 +1,4 @@
-**furzr** is an old project (2013) which was used some deprecated technologies:
+**furzr** is an old project (2013) which used some deprecated technologies:
 * Server and hosting: Google App Engine (Java servlets)
 * Client side: jQuery, arbor.js, d3.js
 * Data: last.fm API, Rovi API and 7digital API
