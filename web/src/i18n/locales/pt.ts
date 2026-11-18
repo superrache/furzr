@@ -8,8 +8,8 @@ export const pt: Messages = {
   "lang.label": "Idioma",
 
   "form.add": "Adicionar",
-  "sound.toggle": "Ligar/desligar som",
-  "sound.on": "Som ligado",
+  "sound.mute": "Silenciar",
+  "sound.unmute": "Ativar o som",
   "sound.off": "Som desligado",
   "sound.none": "Nenhum trecho disponível",
   "sound.unavailable": "Serviço de trechos indisponível",
@@ -84,6 +84,7 @@ export const pt: Messages = {
   "difficulty.3": "Difícil",
   "difficulty.4": "Extrema",
   "game.record": "Novo recorde pessoal!",
+  "game.result": "Resultado",
   "game.failed": "Nenhum desafio encontrado, tente novamente",
   "game.shareGoal": "Desafio furzr: ligue {a} a {b} com o mínimo de cliques",
   "game.shareWon": "Liguei {a} a {b} no furzr. Cliques: {n}, pontuação: {score}. Consegue fazer melhor?",
@@ -98,7 +99,7 @@ export const pt: Messages = {
   "victory.par": "meta: {n} cliques",
   "victory.best": "Recorde",
   "victory.share": "Compartilhar",
-  "victory.close": "Fechar",
+  "victory.viewMap": "Ver o mapa",
   "victory.copied": "Link copiado! Envie para um amigo para desafiá-lo.",
   "tip.loading": "Carregando…",
 

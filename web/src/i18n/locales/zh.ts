@@ -8,8 +8,8 @@ export const zh: Messages = {
   "lang.label": "语言",
 
   "form.add": "添加",
-  "sound.toggle": "开启/关闭声音",
-  "sound.on": "声音已开启",
+  "sound.mute": "静音",
+  "sound.unmute": "取消静音",
   "sound.off": "声音已关闭",
   "sound.none": "没有可试听的歌曲",
   "sound.unavailable": "试听服务不可用",
@@ -83,6 +83,7 @@ export const zh: Messages = {
   "difficulty.3": "困难",
   "difficulty.4": "极难",
   "game.record": "刷新个人最佳！",
+  "game.result": "结果",
   "game.failed": "未找到挑战，请重试",
   "game.shareGoal": "furzr 挑战：用最少的点击连接 {a} 和 {b}",
   "game.shareWon": "我在 furzr 上连接了 {a} 和 {b}。点击：{n}，得分：{score}。你能做得更好吗？",
@@ -97,7 +98,7 @@ export const zh: Messages = {
   "victory.par": "目标：{n} 次点击",
   "victory.best": "最佳",
   "victory.share": "分享",
-  "victory.close": "关闭",
+  "victory.viewMap": "查看地图",
   "victory.copied": "链接已复制！发给朋友，向他们发起挑战。",
   "tip.loading": "加载中…",
 

@@ -8,8 +8,8 @@ export const tr: Messages = {
   "lang.label": "Dil",
 
   "form.add": "Ekle",
-  "sound.toggle": "Sesi aç/kapat",
-  "sound.on": "Ses açık",
+  "sound.mute": "Sesi kapat",
+  "sound.unmute": "Sesi aç",
   "sound.off": "Ses kapalı",
   "sound.none": "Önizleme parçası yok",
   "sound.unavailable": "Önizleme hizmeti kullanılamıyor",
@@ -84,6 +84,7 @@ export const tr: Messages = {
   "difficulty.3": "Zor",
   "difficulty.4": "Aşırı",
   "game.record": "Yeni kişisel rekor!",
+  "game.result": "Sonuç",
   "game.failed": "Meydan okuma bulunamadı, lütfen tekrar deneyin",
   "game.shareGoal": "furzr meydan okuması: {a} ile {b} arasını olabildiğince az tıklamayla bağlayın",
   "game.shareWon": "furzr'da {a} ile {b} arasını bağladım. Tıklama: {n}, puan: {score}. Daha iyisini yapabilir misin?",
@@ -98,7 +99,7 @@ export const tr: Messages = {
   "victory.par": "hedef: {n} tıklama",
   "victory.best": "Rekor",
   "victory.share": "Paylaş",
-  "victory.close": "Kapat",
+  "victory.viewMap": "Haritayı gör",
   "victory.copied": "Bağlantı kopyalandı! Meydan okumak için bir arkadaşınıza gönderin.",
   "tip.loading": "Yükleniyor…",
 

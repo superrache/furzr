@@ -22,8 +22,9 @@ and switchable from the language menu.
 
 **Game mode** (the *Play* switch above the search field): furzr picks two well-known artists far apart from each other; link them with the shortest possible
 snake. Each challenge is rated from easy to extreme (estimated distance between the two artists), which sets a
-target number of clicks: 1000 to 4000 points at the target, 20% less for every extra click. Challenges can be shared
-(`?mode=game&from=…&to=…`).
+target number of clicks: 1000 to 4000 points at the target, 20% less for every extra click. When you win, the map first
+shows your winning path (and confetti), then the result card opens; "View the map" brings you back to the path.
+Challenges can be shared (`?mode=game&from=…&to=…`).
 
 Keys go in `web/.env`: `VITE_LASTFM_API_KEY` (required) and `VITE_TMDB_API_KEY` (optional, enables the movies mode).
 

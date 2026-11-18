@@ -8,8 +8,8 @@ export const ja: Messages = {
   "lang.label": "言語",
 
   "form.add": "追加",
-  "sound.toggle": "サウンドのオン/オフ",
-  "sound.on": "サウンドオン",
+  "sound.mute": "ミュート",
+  "sound.unmute": "ミュート解除",
   "sound.off": "サウンドオフ",
   "sound.none": "試聴できる曲がありません",
   "sound.unavailable": "試聴サービスを利用できません",
@@ -84,6 +84,7 @@ export const ja: Messages = {
   "difficulty.3": "むずかしい",
   "difficulty.4": "エクストリーム",
   "game.record": "自己ベスト更新！",
+  "game.result": "結果",
   "game.failed": "お題が見つかりませんでした。もう一度お試しください",
   "game.shareGoal": "furzr のお題：{a} と {b} をできるだけ少ないクリックでつなごう",
   "game.shareWon": "furzr で {a} と {b} をつなぎました。クリック：{n}、得点：{score}。あなたはもっとうまくできる？",
@@ -98,7 +99,7 @@ export const ja: Messages = {
   "victory.par": "目標：{n} クリック",
   "victory.best": "ベスト",
   "victory.share": "共有",
-  "victory.close": "閉じる",
+  "victory.viewMap": "マップを見る",
   "victory.copied": "リンクをコピーしました！友だちに送って挑戦してもらいましょう。",
   "tip.loading": "読み込み中…",
 

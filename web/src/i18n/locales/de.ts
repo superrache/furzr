@@ -8,8 +8,8 @@ export const de: Messages = {
   "lang.label": "Sprache",
 
   "form.add": "Hinzufügen",
-  "sound.toggle": "Ton an/aus",
-  "sound.on": "Ton an",
+  "sound.mute": "Ton aus",
+  "sound.unmute": "Ton an",
   "sound.off": "Ton aus",
   "sound.none": "Keine Hörprobe verfügbar",
   "sound.unavailable": "Hörproben-Dienst nicht verfügbar",
@@ -84,6 +84,7 @@ export const de: Messages = {
   "difficulty.3": "Schwer",
   "difficulty.4": "Extrem",
   "game.record": "Neuer persönlicher Rekord!",
+  "game.result": "Ergebnis",
   "game.failed": "Keine Herausforderung gefunden, bitte erneut versuchen",
   "game.shareGoal": "furzr-Herausforderung: Verbinde {a} mit {b} mit so wenigen Klicks wie möglich",
   "game.shareWon": "Ich habe auf furzr {a} mit {b} verbunden. Klicks: {n}, Punkte: {score}. Schaffst du es besser?",
@@ -98,7 +99,7 @@ export const de: Messages = {
   "victory.par": "Ziel: {n} Klicks",
   "victory.best": "Rekord",
   "victory.share": "Teilen",
-  "victory.close": "Schließen",
+  "victory.viewMap": "Karte ansehen",
   "victory.copied": "Link kopiert! Schick ihn einem Freund, um ihn herauszufordern.",
   "tip.loading": "Wird geladen…",
 

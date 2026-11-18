@@ -8,8 +8,8 @@ export const ru: Messages = {
   "lang.label": "Язык",
 
   "form.add": "Добавить",
-  "sound.toggle": "Включить/выключить звук",
-  "sound.on": "Звук включён",
+  "sound.mute": "Выключить звук",
+  "sound.unmute": "Включить звук",
   "sound.off": "Звук выключен",
   "sound.none": "Фрагмент недоступен",
   "sound.unavailable": "Сервис фрагментов недоступен",
@@ -84,6 +84,7 @@ export const ru: Messages = {
   "difficulty.3": "Высокая",
   "difficulty.4": "Экстрим",
   "game.record": "Новый личный рекорд!",
+  "game.result": "Результат",
   "game.failed": "Не удалось найти задание, попробуйте ещё раз",
   "game.shareGoal": "Задание furzr: соедините {a} и {b} за минимум кликов",
   "game.shareWon": "Я соединил {a} и {b} в furzr. Клики: {n}, счёт: {score}. Сможете лучше?",
@@ -98,7 +99,7 @@ export const ru: Messages = {
   "victory.par": "цель: {n} кликов",
   "victory.best": "Рекорд",
   "victory.share": "Поделиться",
-  "victory.close": "Закрыть",
+  "victory.viewMap": "Посмотреть карту",
   "victory.copied": "Ссылка скопирована! Отправьте её другу, чтобы бросить ему вызов.",
   "tip.loading": "Загрузка…",
 

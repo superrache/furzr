@@ -8,8 +8,8 @@ export const es: Messages = {
   "lang.label": "Idioma",
 
   "form.add": "Añadir",
-  "sound.toggle": "Activar/silenciar sonido",
-  "sound.on": "Sonido activado",
+  "sound.mute": "Silenciar",
+  "sound.unmute": "Activar el sonido",
   "sound.off": "Sonido desactivado",
   "sound.none": "No hay fragmento disponible",
   "sound.unavailable": "Servicio de fragmentos no disponible",
@@ -84,6 +84,7 @@ export const es: Messages = {
   "difficulty.3": "Difícil",
   "difficulty.4": "Extrema",
   "game.record": "¡Nuevo récord personal!",
+  "game.result": "Resultado",
   "game.failed": "No se encontró ningún reto, inténtalo de nuevo",
   "game.shareGoal": "Reto furzr: une a {a} con {b} con el menor número de clics",
   "game.shareWon": "He unido a {a} con {b} en furzr. Clics: {n}, puntuación: {score}. ¿Puedes hacerlo mejor?",
@@ -98,7 +99,7 @@ export const es: Messages = {
   "victory.par": "objetivo: {n} clics",
   "victory.best": "Récord",
   "victory.share": "Compartir",
-  "victory.close": "Cerrar",
+  "victory.viewMap": "Ver el mapa",
   "victory.copied": "¡Enlace copiado! Envíaselo a un amigo para retarlo.",
   "tip.loading": "Cargando…",
 

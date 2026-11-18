@@ -15,8 +15,8 @@ export const en = {
   "lang.label": "Language",
 
   "form.add": "Add",
-  "sound.toggle": "Sound on/off",
-  "sound.on": "Sound on",
+  "sound.mute": "Mute",
+  "sound.unmute": "Unmute",
   "sound.off": "Sound off",
   "sound.none": "No preview song available",
   "sound.unavailable": "Preview service unavailable",
@@ -90,6 +90,7 @@ export const en = {
   "difficulty.3": "Hard",
   "difficulty.4": "Extreme",
   "game.record": "New personal best!",
+  "game.result": "Result",
   "game.failed": "Couldn't find a challenge, please try again",
   "game.shareGoal": "furzr challenge: link {a} to {b} in as few clicks as possible",
   "game.shareWon": "I linked {a} to {b} on furzr. Clicks: {n}, score: {score}. Can you do better?",
@@ -104,7 +105,7 @@ export const en = {
   "victory.par": "target: {n} clicks",
   "victory.best": "Best",
   "victory.share": "Share",
-  "victory.close": "Close",
+  "victory.viewMap": "View the map",
   "victory.copied": "Link copied! Send it to a friend to challenge them.",
   "tip.loading": "Loading…",
 

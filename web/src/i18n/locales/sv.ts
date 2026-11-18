@@ -8,8 +8,8 @@ export const sv: Messages = {
   "lang.label": "Språk",
 
   "form.add": "Lägg till",
-  "sound.toggle": "Ljud på/av",
-  "sound.on": "Ljud på",
+  "sound.mute": "Stäng av ljudet",
+  "sound.unmute": "Slå på ljudet",
   "sound.off": "Ljud av",
   "sound.none": "Inget smakprov tillgängligt",
   "sound.unavailable": "Tjänsten för smakprov är inte tillgänglig",
@@ -84,6 +84,7 @@ export const sv: Messages = {
   "difficulty.3": "Svår",
   "difficulty.4": "Extrem",
   "game.record": "Nytt personbästa!",
+  "game.result": "Resultat",
   "game.failed": "Ingen utmaning hittades, försök igen",
   "game.shareGoal": "furzr-utmaning: koppla ihop {a} med {b} med så få klick som möjligt",
   "game.shareWon": "Jag kopplade ihop {a} med {b} på furzr. Klick: {n}, poäng: {score}. Kan du göra bättre?",
@@ -98,7 +99,7 @@ export const sv: Messages = {
   "victory.par": "mål: {n} klick",
   "victory.best": "Rekord",
   "victory.share": "Dela",
-  "victory.close": "Stäng",
+  "victory.viewMap": "Visa kartan",
   "victory.copied": "Länken har kopierats! Skicka den till en vän och utmana hen.",
   "tip.loading": "Laddar…",
 

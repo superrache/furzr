@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#15191e" />
     <title>furzr</title>
     <meta
       name="description"
@@ -26,9 +28,6 @@
         <button type="button" class="button" data-play="explore" aria-pressed="true" data-i18n="play.explore">Explore</button>
         <button type="button" class="button" data-play="game" aria-pressed="false" data-i18n="play.game">Play</button>
       </div>
-      <button id="sound-toggle" type="button" class="button icon" aria-pressed="true" title="Sound on/off" data-i18n-attr="title:sound.toggle">
-        <img src="volume_on.png" alt="Sound on" />
-      </button>
       <button id="artist-submit" type="submit" class="button" data-i18n="form.add">Add</button>
       <select id="mode" class="button" aria-label="Map mode" title="What the map links together" data-i18n-attr="aria-label:mode.label;title:mode.title">
         <option value="similar" data-i18n="mode.similar">Similar</option>
@@ -106,7 +105,6 @@
       <button class="drawer-tab" type="button" aria-expanded="false">
         <h2 id="overview-name"></h2>
       </button>
-      <div id="sound-title" aria-live="polite"></div>
       <div class="drawer-content">
         <div class="overview-detail">
           <a id="overview-link" href="https://www.last.fm" target="_blank" rel="noopener">
@@ -130,12 +128,19 @@
       <button id="clear" type="button" class="button" data-i18n="clear">Clear the map</button>
     </div>
 
+    <!-- lecteur d'extraits : hors du panneau de la fiche (le pointer pour couper le son ne l'ouvre
+         plus), toujours visible en bas, centré -->
+    <div id="player" hidden>
+      <div id="sound-title" aria-live="polite"></div>
+    </div>
+
     <div id="toasts" aria-live="polite"></div>
     <div id="artist-tip" role="tooltip" hidden></div>
 
     <!-- victoire du mode jeu : par-dessus toute l'application (top layer de <dialog>) -->
+    <!-- confettis : d'abord sur la carte, puis déplacés dans la fenêtre de victoire à son ouverture -->
+    <canvas id="confetti" aria-hidden="true"></canvas>
     <dialog id="victory" aria-labelledby="victory-title">
-      <canvas id="confetti" aria-hidden="true"></canvas>
       <div class="victory-card">
         <svg class="victory-trophy" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
           <path d="M18 8h28v14c0 9-6 16-14 16s-14-7-14-16z" fill="#f5b400" />
@@ -159,7 +164,7 @@
         <div class="victory-actions">
           <button id="victory-share" type="button" class="button primary" autofocus data-i18n="victory.share">Share</button>
           <button id="victory-new" type="button" class="button" data-i18n="game.new">New challenge</button>
-          <button id="victory-close" type="button" class="button" data-i18n="victory.close">Close</button>
+          <button id="victory-map" type="button" class="button" data-i18n="victory.viewMap">View the map</button>
         </div>
         <p id="victory-feedback" class="feedback" role="status" hidden></p>
       </div>

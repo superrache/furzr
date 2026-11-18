@@ -8,7 +8,7 @@ import { ArtistMap, normalizeName, type Growth, type MapNode } from "./graph/mod
 import { decodeSnapshot, encodeSnapshot } from "./graph/share";
 import { MapView, themeFromCss } from "./graph/view";
 import { Autocomplete } from "./ui/autocomplete";
-import { byId, closeDrawers, prefs, setupDrawers, toast } from "./ui/dom";
+import { byId, closeDrawers, exposeHeight, prefs, setupDrawers, toast } from "./ui/dom";
 import { escapeHtml } from "./ui/html";
 import { ArtistTip } from "./ui/artist-tip";
 import { launchConfetti } from "./ui/confetti";
@@ -29,8 +29,16 @@ import { LANGUAGES, detectLang, getLang, isLang, setLang, t, translateDocument, 
 
 const params = new URLSearchParams(location.search);
 
+/** Haut-parleur barré (SVG plutôt qu'emoji : rendu identique partout). */
+const MUTED_ICON =
+  '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" fill="none" stroke="currentColor"' +
+  ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/>' +
+  '<path d="M16 9l5 6M21 9l-5 6"/></svg>';
+
 
 /** Nombre de similaires ajoutés à chaque expansion (paramètre d'URL similar_number). */
+/** Durée de la célébration sur la carte avant la fenêtre de victoire (écourtée par un clic ou une touche). */
+const CELEBRATION_MS = 2500;
 const SIMILAR_NUMBER = clamp(Number(params.get("similar_number")) || 16, 1, 50);
 
 function clamp(n: number, min: number, max: number): number {
@@ -89,6 +97,8 @@ class App {
     record: boolean;
   } | null = null;
   private stopConfetti: () => void = () => undefined;
+  /** Vrai entre la victoire et l'ouverture de la fenêtre : la carte célèbre, les clics sont ignorés. */
+  private celebrating = false;
   /** Infobulle des artistes du défi, et éléments du bandeau (créés une fois par défi). */
   private readonly artistTip = new ArtistTip(byId("artist-tip"), () => t("tip.loading"));
   private gameBar: { key: string; status: HTMLElement } | null = null;
@@ -121,9 +131,13 @@ class App {
     const soundParam = params.get("sound");
     const soundOn = soundParam ? soundParam !== "off" : prefs.get("sound") !== "off";
     this.player = new PreviewPlayer(this.deezer, soundOn, (status) => this.renderSound(status));
-    this.renderSoundToggle();
 
     setupDrawers();
+    // lecteur posé à 8 px du bas : la fiche et les outils se placent 6 px au-dessus
+    exposeHeight(byId("player"), "--player-space", 8 + 6);
+    // hauteur du formulaire (variable : interrupteur, bandeau du défi sur 1 à 3 lignes…) : les outils
+    // se placent dessous sur mobile
+    exposeHeight(byId("artist-form"), "--form-height", 0);
     this.autocomplete = new Autocomplete(
       this.input,
       (query) => this.mode.provider.suggest(query),
@@ -153,7 +167,12 @@ class App {
         void this.addArtist(this.input.value);
       }
     });
-    byId("sound-toggle").addEventListener("click", () => this.toggleSound());
+    // la note de l'extrait en cours coupe ou rétablit le son (contenu recréé : délégation)
+    byId("sound-title").addEventListener("click", (e) => {
+      if ((e.target as Element).closest(".sound-note")) {
+        this.toggleSound();
+      }
+    });
     // en jeu, vider la carte = recommencer le même défi
     byId("clear").addEventListener("click", () => (this.isGame && this.challenge ? void this.startChallenge(this.challenge) : this.clear()));
     for (const button of this.growthButtons()) {
@@ -234,6 +253,9 @@ class App {
   }
 
   private async explore(node: MapNode): Promise<void> {
+    if (this.celebrating) {
+      return;
+    }
     const artist: Artist = { id: node.id, name: node.name, mbid: node.mbid };
     this.map.markExplored(node.id);
     this.renderShare();
@@ -283,6 +305,7 @@ class App {
     this.refresh(false);
     byId("overview").hidden = true;
     this.player.stop();
+    this.renderSound(this.soundStatus);
     if (location.hash) {
       history.replaceState(null, "", location.pathname + location.search);
     }
@@ -327,7 +350,7 @@ class App {
   private async newChallenge(names?: { from: string; to: string }): Promise<void> {
     const request = ++this.gameRequest;
     this.challenge = null;
-    this.gameResult = null;
+    this.resetGameResult();
     this.renderGame();
     this.setBusy(true);
     try {
@@ -408,7 +431,7 @@ class App {
       return;
     }
     this.challenge = challenge;
-    this.gameResult = null;
+    this.resetGameResult();
     this.estimate(challenge);
     this.help = "done";
     this.leaveStartScreen();
@@ -451,15 +474,84 @@ class App {
     const result: NonNullable<App["gameResult"]> = { moves, score: null };
     this.gameResult = result;
     const start = this.map.findByName(challenge.from.name);
-    const found = start ? this.map.shortestPath(start.id, target.id).map((n) => n.name) : [];
-    const path = found.length > 1 ? found : [challenge.from.name, target.name];
+    const nodes = start ? this.map.shortestPath(start.id, target.id) : [];
+    const path = nodes.length > 1 ? nodes.map((n) => n.name) : [challenge.from.name, target.name];
     this.renderGame();
+    // d'abord la carte : chemin en évidence, cible qui pulse, confettis ; la fenêtre vient après
+    this.view.highlightPath(nodes.length > 1 ? nodes.map((n) => n.id) : [target.id]);
+    this.celebrating = true;
+    this.launchConfetti();
     // l'estimation est presque toujours finie (il a fallu au moins un clic) ; sinon on l'attend
-    void this.estimateOf(challenge).then((difficulty) => {
+    void Promise.all([this.estimateOf(challenge), this.celebrate(CELEBRATION_MS)]).then(([difficulty]) => {
       if (this.gameResult === result) {
         this.finishGame(result, difficulty, path);
       }
     });
+  }
+
+  /** Oublie la victoire précédente (nouveau défi, défi recommencé, sortie du jeu). */
+  private resetGameResult(): void {
+    this.gameResult = null;
+    this.victory = null;
+    this.celebrating = false;
+  }
+
+  /**
+   * Célébration sur la carte avant la fenêtre de victoire : se termine au bout de `ms`, ou dès un
+   * clic, un toucher ou une touche (sans que ce geste n'agisse sur la carte ni sur la fenêtre).
+   */
+  private celebrate(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      const done = () => {
+        clearTimeout(timer);
+        window.removeEventListener("pointerdown", onPointer, true);
+        window.removeEventListener("keydown", onKey, true);
+        resolve();
+      };
+      const onPointer = (e: PointerEvent) => {
+        e.stopPropagation();
+        // la suite du geste (mousedown, click) tomberait dans la fenêtre qui vient de s'ouvrir :
+        // elle lui ôterait le focus, voire la fermerait (clic sur le voile). On l'absorbe.
+        // Sur la carte, il interromprait le recadrage sur le chemin. On l'absorbe en entier.
+        const swallow = (e: Event) => {
+          e.preventDefault();
+          e.stopPropagation();
+        };
+        const types = ["pointerup", "mousedown", "mouseup", "click", "touchstart", "touchend"];
+        for (const type of types) {
+          window.addEventListener(type, swallow, true);
+        }
+        window.addEventListener(
+          "pointerup",
+          () =>
+            setTimeout(() => {
+              for (const type of types) {
+                window.removeEventListener(type, swallow, true);
+              }
+            }, 350),
+          { capture: true, once: true },
+        );
+        done();
+      };
+      const onKey = (e: KeyboardEvent) => {
+        // la touche ne doit pas activer le bouton Partager qui prendra le focus (Entrée, Espace)
+        e.preventDefault();
+        window.addEventListener("keyup", (up) => up.preventDefault(), { capture: true, once: true });
+        done();
+      };
+      const timer = setTimeout(done, ms);
+      window.addEventListener("pointerdown", onPointer, true);
+      window.addEventListener("keydown", onKey, true);
+    });
+  }
+
+  private launchConfetti(): void {
+    const css = getComputedStyle(document.documentElement);
+    const colors = ["--node-input", "--node-exploded", "--node-similar", "--node-target", "--accent"].map((v) =>
+      css.getPropertyValue(v).trim(),
+    );
+    this.stopConfetti();
+    this.stopConfetti = launchConfetti(byId<HTMLCanvasElement>("confetti"), colors);
   }
 
   private estimateOf(challenge: Challenge): Promise<Difficulty> {
@@ -491,7 +583,7 @@ class App {
 
   private setupVictory(): void {
     const dialog = byId<HTMLDialogElement>("victory");
-    byId("victory-close").addEventListener("click", () => dialog.close());
+    byId("victory-map").addEventListener("click", () => dialog.close());
     byId("victory-new").addEventListener("click", () => {
       dialog.close();
       void this.newChallenge();
@@ -505,27 +597,35 @@ class App {
     });
     dialog.addEventListener("close", () => {
       this.stopConfetti();
-      this.victory = null;
+      // les confettis jouent sur la carte avant la fenêtre : leur canvas revient dans la page
+      document.body.append(byId("confetti"));
+      // retour à la carte : cadrée sur le chemin gagnant, toujours en évidence
+      this.view.frameHighlight();
+      // le résumé est gardé : le bouton « Résultat » du bandeau rouvre la fenêtre
+      this.renderGame();
     });
   }
 
-  private showVictory(victory: NonNullable<App["victory"]>): void {
+  /**
+   * Ouvre la fenêtre de victoire. Les confettis, lancés sur la carte au moment de la victoire,
+   * passent dans la fenêtre pour rester au-dessus de son voile. `replay` : réouverture par le
+   * bouton « Résultat », sans défilement du score.
+   */
+  private showVictory(victory: NonNullable<App["victory"]>, replay = false): void {
     this.victory = victory;
+    this.celebrating = false;
     const dialog = byId<HTMLDialogElement>("victory");
     byId("victory-feedback").hidden = true;
     this.renderVictory();
+    dialog.prepend(byId("confetti"));
     if (!dialog.open) {
       dialog.showModal();
     }
     // le bouton Partager a le focus : action la plus probable, et Échap ferme
     byId("victory-share").focus();
-    this.animateScore(victory.score);
-    const css = getComputedStyle(document.documentElement);
-    const colors = ["--node-input", "--node-exploded", "--node-similar", "--node-target", "--accent"].map((v) =>
-      css.getPropertyValue(v).trim(),
-    );
-    this.stopConfetti();
-    this.stopConfetti = launchConfetti(byId<HTMLCanvasElement>("confetti"), colors);
+    if (!replay) {
+      this.animateScore(victory.score);
+    }
   }
 
   /** Textes de la fenêtre (aussi au changement de langue). */
@@ -649,6 +749,16 @@ class App {
       " · ",
       part(t("game.difficulty", { level: level ? t(`difficulty.${level}`) : "…" })),
     );
+    // fenêtre de victoire fermée : un bouton la rouvre
+    const victory = this.victory;
+    if (victory && !byId<HTMLDialogElement>("victory").open) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "result-button";
+      button.textContent = t("game.result");
+      button.addEventListener("click", () => this.showVictory(victory, true));
+      this.gameBar.status.append(" ", button);
+    }
   }
 
   /** Fiche d'un artiste du jeu (Last.fm + photo Deezer), mise en cache par langue. */
@@ -717,43 +827,50 @@ class App {
   private toggleSound(): void {
     const enabled = !this.player.isEnabled;
     prefs.set("sound", enabled ? "on" : "off");
+    const hadFocus = document.activeElement?.classList.contains("sound-note") ?? false;
     this.player.setEnabled(enabled);
-    this.renderSoundToggle();
+    this.renderSound(this.soundStatus);
+    if (hadFocus) {
+      // le bouton est recréé : on lui rend le focus pour enchaîner au clavier
+      byId("sound-title").querySelector<HTMLButtonElement>(".sound-note")?.focus();
+    }
   }
 
-  private renderSoundToggle(): void {
-    const button = byId("sound-toggle");
-    const on = this.player.isEnabled;
-    button.setAttribute("aria-pressed", String(on));
-    const img = button.querySelector("img")!;
-    img.src = on ? "volume_on.png" : "volume_off.png";
-    img.alt = t(on ? "sound.on" : "sound.off");
-  }
-
+  /**
+   * Ligne de l'extrait : une note (animée pendant la lecture) qui coupe le son au clic, ou un
+   * haut-parleur barré qui le rétablit. Rien en mode films (pas d'extraits).
+   */
   private renderSound(status: PreviewStatus): void {
     this.soundStatus = status;
     const el = byId("sound-title");
-    switch (status.state) {
-      case "off":
-        el.textContent = "";
-        break;
-      case "loading":
-        el.innerHTML = '<span class="spinner"></span>';
-        break;
-      case "none":
-        el.innerHTML = `<i>${escapeHtml(t("sound.none"))}</i>`;
-        break;
-      case "unavailable":
-        el.innerHTML = `<i>${escapeHtml(t("sound.unavailable"))}</i>`;
-        break;
-      case "playing": {
-        const t = status.track!;
-        el.innerHTML =
-          `♪ ${escapeHtml(t.artistName)} – <a href="${escapeHtml(t.link)}" target="_blank" rel="noopener">${escapeHtml(t.title)}</a>` +
-          (t.albumTitle ? ` <i>(${escapeHtml(t.albumTitle)})</i>` : "");
-        break;
-      }
+    // le lecteur accompagne la fiche de l'artiste affiché ; pas d'extraits en mode films
+    const music = this.mode.provider.kind === "music";
+    byId("player").hidden = !music || byId("overview").hidden;
+    if (!music) {
+      el.textContent = "";
+      return;
     }
+    const on = this.player.isEnabled;
+    const label = escapeHtml(t(on ? "sound.mute" : "sound.unmute"));
+    const icon = on ? '<span aria-hidden="true">♪</span>' : MUTED_ICON;
+    const playing = on && status.state === "playing";
+    const button =
+      `<button type="button" class="sound-note${playing ? " playing" : ""}${on ? "" : " muted"}"` +
+      ` aria-label="${label}" title="${label}">${icon}</button> `;
+    let text = "";
+    if (!on) {
+      text = `<i>${escapeHtml(t("sound.off"))}</i>`;
+    } else if (status.state === "loading") {
+      text = '<span class="spinner"></span>';
+    } else if (status.state === "none" || status.state === "unavailable") {
+      text = `<i>${escapeHtml(t(status.state === "none" ? "sound.none" : "sound.unavailable"))}</i>`;
+    } else if (status.state === "playing") {
+      const track = status.track!;
+      text =
+        `${escapeHtml(track.artistName)} – <a href="${escapeHtml(track.link)}" target="_blank" rel="noopener">${escapeHtml(track.title)}</a>` +
+        (track.albumTitle ? ` <i>(${escapeHtml(track.albumTitle)})</i>` : "");
+    }
+    el.innerHTML = `${button}<span class="sound-text">${text}</span>`;
   }
 
   // ---------- partage ----------
@@ -887,7 +1004,6 @@ class App {
       history.replaceState(null, "", url);
     }
     this.input.placeholder = t(this.mode.provider.kind === "movie" ? "input.movie" : "input.artist");
-    this.renderSoundToggle();
     this.renderSound(this.soundStatus);
     this.renderShare();
     this.renderGame();
@@ -972,15 +1088,15 @@ class App {
     this.input.placeholder = t(this.mode.provider.kind === "movie" ? "input.movie" : "input.artist");
     this.autocomplete.close();
     const music = this.mode.provider.kind === "music";
-    byId("sound-toggle").hidden = !music;
     if (!music) {
       this.player.stop();
     }
+    this.renderSound(this.soundStatus);
     if (!this.isGame) {
       // fin du jeu : plus de cible, retour à la croissance choisie
       this.gameRequest++;
       this.challenge = null;
-      this.gameResult = null;
+      this.resetGameResult();
       this.view.setTarget("");
     }
     this.map.growth = this.isGame ? "snake" : this.growthChoice;
