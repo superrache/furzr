@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>furzr</title>
+    <meta
+      name="description"
+      content="Furzr offers a new way to explore the world of music, browsing relationships between artists or bands and listening samples. Expand your musical knowledge like the leaves of a tree."
+    />
+    <meta property="og:title" content="furzr" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="furzr-logo-256.png" />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="apple-touch-icon-precomposed.png" />
+  </head>
+  <body class="start">
+    <div id="map" aria-label="Artist similarity map" data-i18n-attr="aria-label:map.label"></div>
+    <div id="veil"></div>
+
+    <header id="title"><h1>furzr</h1></header>
+
+    <form id="artist-form" class="floating" autocomplete="off">
+      <button id="sound-toggle" type="button" class="button icon" aria-pressed="true" title="Sound on/off" data-i18n-attr="title:sound.toggle">
+        <img src="volume_on.png" alt="Sound on" />
+      </button>
+      <button id="artist-submit" type="submit" class="button" data-i18n="form.add">Add</button>
+      <select id="mode" class="button" aria-label="Map mode" title="What the map links together" data-i18n-attr="aria-label:mode.label;title:mode.title">
+        <option value="similar" data-i18n="mode.similar">Similar</option>
+        <option value="influences" data-i18n="mode.influences">Influences</option>
+        <option value="movies" data-i18n="mode.movies">Movies</option>
+      </select>
+      <span><input id="artist-input" type="search" placeholder="Give a music artist name here" aria-label="Artist name" data-i18n-attr="aria-label:input.label" /></span>
+    </form>
+
+    <span id="lang-box">
+      <select id="lang" class="button" aria-label="Language" data-i18n-attr="aria-label:lang.label;title:lang.label"></select>
+      <span id="lang-code" aria-hidden="true"></span>
+    </span>
+
+    <aside id="about" class="drawer drawer-left">
+      <button class="drawer-tab" type="button" aria-expanded="false"><h1>furzr</h1></button>
+      <div class="drawer-content">
+        <section class="box">
+          <h3 data-i18n="about.title">About this app</h3>
+          <p data-i18n-html="about.introHtml">
+            <b>furzr</b> offers an original way to explore the world of music, browsing relationships between artists or bands
+            and listening samples. This app lets you expand your musical knowledge like the leaves of a tree and find out what
+            you will be listening soon.
+          </p>
+          <p data-i18n="about.howto">
+            Type an artist, then click on any name to expand the map. Drag names around, scroll or pinch to zoom.
+          </p>
+          <p data-i18n-html="about.growthHtml">
+            <b>Snake</b> (Crazy Snake) keeps only the path you followed: unexplored names vanish at each step.
+            <b>Tree</b> (Huge Tree of Death) removes nothing and lets the map grow forever.
+          </p>
+          <p data-i18n-html="about.modesHtml">
+            Three modes: <b>Similar</b> artists, <b>Influences</b> (who inspired an artist, and whom they inspired) and,
+            when available, <b>Movies</b> (recommended films).
+          </p>
+          <p data-i18n-html="about.creditsHtml">
+            <b>furzr</b> uses data from <a href="https://www.last.fm" target="_blank" rel="noopener">Last.fm</a>,
+            <a href="https://www.wikidata.org" target="_blank" rel="noopener">Wikidata</a> and
+            <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a>, and audio previews from
+            <a href="https://www.deezer.com" target="_blank" rel="noopener">Deezer</a>. This product uses the TMDB API but
+            is not endorsed or certified by TMDB.
+          </p>
+          <p class="legend">
+            <span class="dot input"></span> <span data-i18n="legend.input">your artists</span>
+            <span class="dot exploded"></span> <span data-i18n="legend.exploded">explored</span>
+            <span class="dot similar"></span> <span data-i18n="legend.similar">similar</span>
+          </p>
+          <p class="copyright">© 2013-2026 furzr</p>
+        </section>
+      </div>
+    </aside>
+
+    <aside id="share" class="drawer drawer-right">
+      <button class="drawer-tab" type="button" aria-expanded="false"><h2 data-i18n="share.tab">Share this map</h2></button>
+      <div class="drawer-content">
+        <section class="box">
+          <h3 id="map-description">Expand your artist map</h3>
+          <div class="share-actions">
+            <button id="share-copy" type="button" class="button" disabled data-i18n="share.copy">Copy link</button>
+            <button id="share-native" type="button" class="button" hidden disabled data-i18n="share.native">Share…</button>
+          </div>
+          <input id="share-url" type="text" readonly hidden aria-label="Link to this map" data-i18n-attr="aria-label:share.urlLabel" />
+          <p id="share-feedback" class="feedback" hidden></p>
+        </section>
+      </div>
+    </aside>
+
+    <aside id="overview" class="drawer drawer-bottom" hidden>
+      <button class="drawer-tab" type="button" aria-expanded="false">
+        <h2 id="overview-name"></h2>
+      </button>
+      <div id="sound-title" aria-live="polite"></div>
+      <div class="drawer-content">
+        <div class="overview-detail">
+          <a id="overview-link" href="https://www.last.fm" target="_blank" rel="noopener">
+            <img id="overview-image" alt="" width="126" height="126" hidden />
+          </a>
+          <p id="overview-tags"></p>
+          <p id="overview-bio"></p>
+        </div>
+      </div>
+    </aside>
+
+    <div id="tools" class="floating">
+      <span class="segmented" role="group" aria-label="Map growth" data-i18n-attr="aria-label:growth.label">
+        <button type="button" class="button" data-growth="snake" aria-pressed="true"
+          title="Crazy Snake: unexplored names vanish at each step, only your path remains"
+          data-i18n="growth.snake" data-i18n-attr="title:growth.snakeTitle">Snake</button>
+        <button type="button" class="button" data-growth="tree" aria-pressed="false"
+          title="Huge Tree of Death: nothing is removed, the map keeps growing"
+          data-i18n="growth.tree" data-i18n-attr="title:growth.treeTitle">Tree</button>
+      </span>
+      <button id="clear" type="button" class="button" data-i18n="clear">Clear the map</button>
+    </div>
+
+    <div id="toasts" aria-live="polite"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

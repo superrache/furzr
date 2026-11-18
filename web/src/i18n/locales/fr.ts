@@ -1,0 +1,84 @@
+import type { Messages } from "./en";
+
+export const fr: Messages = {
+  "meta.description":
+    "furzr propose une nouvelle façon d'explorer le monde de la musique : parcourez les liens entre artistes ou groupes et écoutez des extraits. Faites grandir votre culture musicale comme les branches d'un arbre.",
+  "map.label": "Carte de similarité entre artistes",
+
+  "lang.label": "Langue",
+
+  "form.add": "Ajouter",
+  "sound.toggle": "Activer/couper le son",
+  "sound.on": "Son activé",
+  "sound.off": "Son coupé",
+  "sound.none": "Aucun extrait disponible",
+  "sound.unavailable": "Service d'extraits indisponible",
+
+  "mode.label": "Mode de la carte",
+  "mode.title": "Ce que la carte relie",
+  "mode.similar": "Similaires",
+  "mode.influences": "Influences",
+  "mode.movies": "Films",
+  "mode.confirmSwitch": "Changer de mode efface la carte actuelle. Continuer ?",
+
+  "input.label": "Nom de l'artiste",
+  "input.artist": "Saisissez un nom d'artiste",
+  "input.movie": "Saisissez un titre de film",
+  "suggestions.label": "Suggestions",
+  "suggestions.fans": "{n} fans",
+
+  "about.title": "À propos",
+  "about.introHtml":
+    "<b>furzr</b> propose une façon originale d'explorer le monde de la musique : parcourez les liens entre artistes ou groupes et écoutez des extraits. Faites grandir votre culture musicale comme les branches d'un arbre et découvrez ce que vous écouterez bientôt.",
+  "about.howto":
+    "Saisissez un artiste, puis cliquez sur un nom pour agrandir la carte. Déplacez les noms, faites défiler ou pincez pour zoomer.",
+  "about.growthHtml":
+    "<b>Serpent</b> (Crazy Snake) ne garde que le chemin parcouru : les noms non explorés disparaissent à chaque étape. <b>Arbre</b> (Huge Tree of Death) ne supprime rien et laisse la carte grandir sans fin.",
+  "about.modesHtml":
+    "Trois modes : artistes <b>Similaires</b>, <b>Influences</b> (qui a inspiré un artiste, et qui il a inspiré) et, si disponible, <b>Films</b> (films recommandés).",
+  "about.creditsHtml":
+    "<b>furzr</b> utilise les données de {lastfm}, {wikidata} et {tmdb}, et les extraits audio de {deezer}. Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.",
+  "legend.input": "vos artistes",
+  "legend.exploded": "explorés",
+  "legend.similar": "similaires",
+
+  "share.tab": "Partager la carte",
+  "share.copy": "Copier le lien",
+  "share.native": "Partager…",
+  "share.urlLabel": "Lien vers cette carte",
+  "share.copied": "Lien copié ! Toute personne qui l'ouvre verra cette carte.",
+  "share.copyManually": "Copiez ce lien pour partager votre carte.",
+  "share.invalid": "Ce lien de carte partagée n'est pas valide",
+  "share.unavailable": "Cette carte partagée utilise une source de données indisponible ici",
+
+  "map.description": "Cette carte montre comment relier {a} à {b}",
+  "map.empty.similar": "Agrandissez votre carte d'artistes",
+  "map.empty.influences": "Agrandissez votre carte des influences",
+  "map.empty.movies": "Agrandissez votre carte de films",
+
+  "notFound.similar": "Aucun artiste connu sous ce nom, essayez-en un autre",
+  "notFound.influences": "Cet artiste est inconnu de Wikidata, essayez-en un autre",
+  "notFound.movies": "Aucun film connu sous ce titre, essayez-en un autre",
+  "noNeighbors.similar": "Cet artiste n'a pas d'artistes similaires",
+  "noNeighbors.influences": "Aucune influence connue pour cet artiste sur Wikidata",
+  "noNeighbors.movies": "Aucune recommandation pour ce film",
+
+  "help.clickArtist": "Cliquez sur un artiste pour agrandir la carte",
+  "help.clickMovie": "Cliquez sur un film pour agrandir la carte",
+  "help.share": "Amusez-vous bien et partagez votre carte !",
+
+  "growth.label": "Croissance de la carte",
+  "growth.snake": "Serpent",
+  "growth.tree": "Arbre",
+  "growth.snakeTitle": "Crazy Snake : les noms non explorés disparaissent à chaque étape, seul votre chemin reste",
+  "growth.treeTitle": "Huge Tree of Death : rien n'est supprimé, la carte grandit sans fin",
+  "growth.toSnake": "Serpent : les noms non explorés disparaîtront au prochain clic",
+  "growth.toTree": "Arbre : désormais, plus rien n'est retiré de la carte",
+  "clear": "Effacer la carte",
+
+  "overview.about": "À propos : {name}",
+  "overview.readMore": "En savoir plus sur {source}",
+
+  "error.service": "Le service est momentanément indisponible, réessayez dans un instant",
+  "error.generic": "Une erreur s'est produite, veuillez réessayer",
+};

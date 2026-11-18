@@ -1,0 +1,643 @@
+:root {
+  --text: #3e454c;
+  --accent: #00b3ff;
+  --accent-dark: #2572b8;
+  --panel: rgba(226, 226, 226, 0.85);
+  --surface: #ffffff;
+  --error: #ffa0a0;
+  --toast: rgba(255, 255, 140, 0.95);
+
+  /* graphe (lus par MapView) */
+  --map-bg: #ffffff;
+  --map-link: rgba(0, 0, 0, 0.35);
+  --map-halo: rgba(255, 255, 255, 0.9);
+  --map-ring: rgba(0, 0, 0, 0.1);
+  --map-ring-hover: rgba(0, 179, 255, 0.8);
+  --map-font: Tahoma, Verdana, "Segoe UI", sans-serif;
+  --node-input: #de00ff;
+  --node-exploded: #2572b8;
+  --node-similar: #ff5500;
+
+  --transition: 0.6s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: Tahoma, Verdana, "Segoe UI", sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--map-bg);
+}
+
+a {
+  color: var(--accent-dark);
+}
+
+a:hover {
+  color: white;
+  background-color: var(--accent);
+}
+
+h1,
+h2 {
+  margin: 0;
+  color: var(--accent);
+  text-shadow: 1px 1px 2px var(--accent-dark);
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.3em;
+}
+
+h3 {
+  font-size: 1em;
+  margin: 0 0 8px;
+}
+
+p {
+  margin: 0 0 8px;
+}
+
+input {
+  font: inherit;
+  font-weight: bold;
+  color: var(--text);
+  width: 100%;
+  padding: 5px 6px;
+  border: 1px solid rgba(200, 200, 200, 0.9);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  background: white;
+}
+
+.button {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 0;
+  border-radius: 3px;
+  padding: 5px 12px;
+  cursor: pointer;
+  min-height: 30px;
+}
+
+.button:hover:not(:disabled),
+.button:focus-visible {
+  background: var(--accent);
+  color: white;
+  outline: none;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.button.icon {
+  padding: 3px 6px;
+}
+
+.button.icon img {
+  display: block;
+  height: 22px;
+}
+
+.floating {
+  position: absolute;
+  z-index: 15;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background-color var(--transition);
+}
+
+.floating:hover,
+.floating:focus-within {
+  background-color: var(--panel);
+}
+
+/* ---------- carte ---------- */
+
+#map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+#veil {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  background: rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+
+.start #veil {
+  opacity: 1;
+}
+
+/* ---------- titre et saisie : centrés au démarrage, puis rangés en haut ---------- */
+
+#title {
+  position: absolute;
+  z-index: 21;
+  left: 12px;
+  top: 8px;
+  font-size: 1em;
+  transition: all var(--transition);
+  pointer-events: none;
+}
+
+.start #title {
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -110%);
+  font-size: 2em;
+}
+
+#artist-form {
+  z-index: 22;
+  right: 205px;
+  top: 5px;
+  width: 420px;
+  font-size: 1em;
+  transition: all var(--transition);
+}
+
+.start #artist-form {
+  right: 50%;
+  top: 30%;
+  transform: translateX(50%);
+  width: min(600px, calc(100vw - 32px));
+  font-size: 1.6em;
+}
+
+#artist-form .button {
+  float: right;
+  margin-left: 5px;
+}
+
+/* sélecteur de mode, rangé à droite avec les boutons */
+#mode {
+  font: inherit;
+  padding: 0 6px;
+}
+
+/* champ, sélecteur et boutons à la même hauteur, quels que soient le navigateur et la taille de police
+   (accueil en 1.6em) : sans hauteur explicite, Firefox dimensionne le <select> différemment */
+#artist-form input,
+#artist-form select,
+#artist-form .button {
+  height: calc(1.3em + 12px);
+}
+
+#artist-form span {
+  display: block;
+  overflow: hidden;
+}
+
+/* auto-complétion */
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 5px;
+  right: 5px;
+  margin: 2px 0 0;
+  padding: 3px;
+  list-style: none;
+  max-height: min(60vh, 360px);
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 3px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  text-align: left;
+}
+
+.suggestions li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.suggestions li:hover,
+.suggestions li[aria-selected="true"] {
+  background: var(--accent);
+  color: white;
+}
+
+.suggestions img {
+  flex: none;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--panel);
+}
+
+.suggestions .name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.suggestions .detail {
+  flex: none;
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+body:not(.start) #title {
+  opacity: 0;
+}
+
+.start #sound-toggle,
+.start #tools,
+.start .drawer {
+  display: none;
+}
+
+/* ---------- langue : toujours dans le coin haut droit, accueil comme carte ---------- */
+
+/* code de langue du sélecteur compact : seulement sur petit écran */
+#lang-code {
+  display: none;
+}
+
+#lang-box {
+  position: absolute;
+  z-index: 22;
+  top: 10px;
+  right: 12px;
+}
+
+#lang {
+  display: block;
+  padding: 0 4px;
+  height: 30px;
+  font-size: 0.9em;
+  background: var(--panel);
+}
+
+/* ---------- panneaux escamotables ---------- */
+
+.drawer {
+  position: absolute;
+  z-index: 14;
+  display: flex;
+  padding: 6px;
+  border-radius: 5px;
+  transition:
+    transform var(--transition),
+    background-color var(--transition);
+}
+
+.drawer.open {
+  background-color: var(--panel);
+}
+
+.drawer-tab {
+  background: none;
+  border: 0;
+  padding: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.drawer-content {
+  width: 380px;
+}
+
+.box {
+  border: 2px solid white;
+  border-radius: 3px;
+  padding: 8px;
+  text-align: justify;
+}
+
+.drawer-left {
+  top: 60px;
+  left: 0;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  transform: translateX(calc(-100% + 44px));
+}
+
+.drawer-left .drawer-tab,
+.drawer-right .drawer-tab {
+  writing-mode: vertical-rl;
+}
+
+.drawer-left .drawer-tab {
+  transform: rotate(180deg);
+}
+
+.drawer-right {
+  top: 125px;
+  right: 0;
+  align-items: flex-start;
+  transform: translateX(calc(100% - 44px));
+}
+
+.drawer-bottom {
+  right: 50px;
+  bottom: 0;
+  flex-direction: column;
+  max-width: 420px;
+  transform: translateY(calc(100% - var(--peek, 64px)));
+}
+
+.drawer-bottom .drawer-tab {
+  text-align: left;
+}
+
+.drawer.open {
+  transform: none;
+}
+
+@media (hover: hover) {
+  .drawer:hover {
+    transform: none;
+    background-color: var(--panel);
+  }
+}
+
+.legend .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 3px 0 8px;
+}
+
+.legend .dot:first-child {
+  margin-left: 0;
+}
+
+.dot.input {
+  background: var(--node-input);
+}
+
+.dot.exploded {
+  background: var(--node-exploded);
+}
+
+.dot.similar {
+  background: var(--node-similar);
+}
+
+.copyright {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.share-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+#share-url {
+  border: 2px solid var(--accent);
+  color: var(--accent-dark);
+}
+
+.feedback {
+  margin-top: 6px;
+  font-size: 0.9em;
+}
+
+/* ---------- fiche artiste ---------- */
+
+#sound-title {
+  padding: 0 4px 6px;
+  min-height: 1.4em;
+  text-align: left;
+}
+
+.overview-detail {
+  max-height: 300px;
+  overflow: auto;
+  text-align: justify;
+}
+
+#overview-link {
+  float: left;
+  margin: 0 8px 4px 0;
+}
+
+#overview-link:hover {
+  background: none;
+}
+
+#overview-image {
+  height: auto; /* affiches de films en 2:3, photos carrées */
+}
+
+#overview-tags {
+  color: var(--accent-dark);
+}
+
+#tools {
+  left: 5px;
+  bottom: 5px;
+  display: flex;
+  gap: 8px;
+}
+
+/* boutons Snake / Tree accolés */
+.segmented {
+  display: inline-flex;
+}
+
+.segmented .button {
+  border-radius: 0;
+}
+
+.segmented .button:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.segmented .button:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.segmented .button[aria-pressed="true"] {
+  background: var(--accent-dark);
+  color: white;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--accent);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- messages ---------- */
+
+#toasts {
+  position: absolute;
+  z-index: 21; /* sous le formulaire et sa liste de propositions */
+  top: 55px;
+  right: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 240px;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 6px 8px;
+  border-radius: 3px;
+  background: var(--toast);
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  animation: fade-in 0.3s ease;
+}
+
+.toast.error {
+  background: var(--error);
+}
+
+.toast.leaving {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- petits écrans ---------- */
+
+@media (max-width: 720px) {
+  #title {
+    display: none;
+  }
+
+  .start #title {
+    display: block;
+  }
+
+  #artist-form {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    background-color: var(--panel);
+  }
+
+  .start #artist-form {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    font-size: 1.2em;
+  }
+
+  .drawer-content {
+    width: min(380px, calc(100vw - 70px));
+  }
+
+  .drawer-left {
+    top: 64px;
+  }
+
+  .drawer-right {
+    top: 64px;
+  }
+
+  .drawer-bottom {
+    left: 8px;
+    right: 8px;
+    max-width: none;
+  }
+
+  .drawer-bottom .drawer-content {
+    width: 100%;
+  }
+
+  #tools {
+    bottom: auto;
+    top: 64px;
+    left: 50px;
+  }
+
+  /* sur mobile, le formulaire de la carte s'arrête avant le sélecteur de langue (largeur fixe) */
+  /* sélecteur compact : le code (« FR ») est affiché par-dessus le <select>, dont le texte est masqué ;
+     la liste native garde les noms complets */
+  body:not(.start) #artist-form {
+    right: 68px;
+  }
+
+  #lang-box {
+    right: 8px;
+  }
+
+  #lang {
+    width: 54px;
+    color: transparent;
+  }
+
+  #lang option {
+    color: var(--text);
+  }
+
+  #lang-code {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: flex;
+    align-items: center;
+    padding-left: 9px;
+    font-size: 0.9em;
+    pointer-events: none;
+  }
+
+  #toasts {
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
