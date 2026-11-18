@@ -56,6 +56,11 @@ export interface MapSnapshot {
   g?: Growth;
 }
 
+/** Comparaison de noms tolérante : « Beyoncé » = « beyonce ». */
+export function normalizeName(name: string): string {
+  return name.normalize("NFKD").replace(/\p{M}/gu, "").trim().toLowerCase();
+}
+
 const linkKey = (a: string, b: string) => (a < b ? `${a}\u0001${b}` : `${b}\u0001${a}`);
 
 /**
@@ -142,6 +147,43 @@ export class ArtistMap {
       }
       this.link(centerId, node.id);
     }
+  }
+
+  /** Nombre de nœuds explorés (clics) : la longueur du snake, qui fait le score du mode jeu. */
+  get exploredCount(): number {
+    return this.explodedIds.length;
+  }
+
+  /** Premier nœud dont le nom correspond (casse et accents ignorés). */
+  findByName(name: string): MapNode | undefined {
+    const wanted = normalizeName(name);
+    return [...this.nodes.values()].find((n) => normalizeName(n.name) === wanted);
+  }
+
+  /** Plus court chemin (en liens) entre deux nœuds, noms compris ; vide s'ils ne sont pas reliés. */
+  shortestPath(fromId: string, toId: string): MapNode[] {
+    if (!this.nodes.has(fromId) || !this.nodes.has(toId)) {
+      return [];
+    }
+    const previous = new Map<string, string | null>([[fromId, null]]);
+    const queue = [fromId];
+    while (queue.length > 0 && !previous.has(toId)) {
+      const id = queue.shift()!;
+      for (const next of this.neighborhood(id)) {
+        if (!previous.has(next)) {
+          previous.set(next, id);
+          queue.push(next);
+        }
+      }
+    }
+    if (!previous.has(toId)) {
+      return [];
+    }
+    const path: MapNode[] = [];
+    for (let id: string | null = toId; id !== null; id = previous.get(id) ?? null) {
+      path.unshift(this.nodes.get(id)!);
+    }
+    return path;
   }
 
   /** Un nœud et ses voisins directs : ce qu'on cadre après une expansion. */

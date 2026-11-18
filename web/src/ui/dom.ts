@@ -28,6 +28,34 @@ export function setupDrawers(): void {
       const open = drawer.classList.toggle("open");
       tab.setAttribute("aria-expanded", String(open));
     });
+    if (drawer.classList.contains("drawer-bottom")) {
+      trackPeek(drawer);
+    }
+  }
+}
+
+/**
+ * Panneau du bas : replié, il ne laisse dépasser que ce qui précède `.drawer-content` (nom de l'artiste,
+ * extrait en cours). Cette hauteur varie (titre sur une ou deux lignes, chargement…) : on la mesure
+ * et on la passe au CSS dans `--peek`.
+ */
+function trackPeek(drawer: HTMLElement): void {
+  const content = drawer.querySelector<HTMLElement>(".drawer-content");
+  if (!content) {
+    return;
+  }
+  const update = () => {
+    // offsetTop ignore la transformation : c'est la hauteur de l'en-tête, padding du panneau compris
+    if (content.offsetParent === drawer) {
+      drawer.style.setProperty("--peek", `${content.offsetTop}px`);
+    }
+  };
+  const observer = new ResizeObserver(update);
+  observer.observe(drawer);
+  for (const child of drawer.children) {
+    if (child !== content) {
+      observer.observe(child);
+    }
   }
 }
 

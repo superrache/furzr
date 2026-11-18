@@ -96,6 +96,21 @@ export class LastFmProvider implements SimilarityProvider {
     return Array.isArray(similars) ? similars.filter((a) => a.name).map(toArtist) : [];
   }
 
+  /**
+   * Artistes les plus écoutés en ce moment sur Last.fm, avec leur nombre total d'auditeurs
+   * (sert au mode jeu à ne proposer que des artistes connus).
+   */
+  async getTopArtists(limit: number): Promise<{ artist: Artist; listeners: number }[]> {
+    const data = await this.call<{ artists?: { artist?: (LastFmArtist & { listeners?: string })[] } }>({
+      method: "chart.gettopartists",
+      limit: String(limit),
+    });
+    const list = data.artists?.artist;
+    return Array.isArray(list)
+      ? list.filter((a) => a.name).map((a) => ({ artist: toArtist(a), listeners: Number(a.listeners) || 0 }))
+      : [];
+  }
+
   private fetchInfo(artist: Artist, lang: string) {
     return this.call<{
       artist?: { name: string; url: string; bio?: { summary?: string }; tags?: { tag?: { name: string }[] | { name: string } } };

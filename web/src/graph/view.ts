@@ -1,6 +1,6 @@
 import ForceGraph from "force-graph";
 import { forceCollide } from "d3-force-3d";
-import { nodeKind, type MapLink, type MapNode, type NodeKind } from "./model";
+import { nodeKind, normalizeName, type MapLink, type MapNode, type NodeKind } from "./model";
 
 export interface MapViewTheme {
   background: string;
@@ -10,6 +10,8 @@ export interface MapViewTheme {
   ringHover: string;
   font: string;
   colors: Record<NodeKind, string>;
+  /** Artiste à atteindre (mode jeu). */
+  target: string;
 }
 
 /** Lit le thème dans les variables CSS (cf. style.css). */
@@ -24,6 +26,7 @@ export function themeFromCss(el: HTMLElement = document.documentElement): MapVie
     ringHover: v("--map-ring-hover"),
     font: v("--map-font"),
     colors: { input: v("--node-input"), exploded: v("--node-exploded"), similar: v("--node-similar") },
+    target: v("--node-target"),
   };
 }
 
@@ -72,6 +75,8 @@ export class MapView {
   /** Nœuds à cadrer (derniers similaires) ; vide = toute la carte. */
   private focusIds: ReadonlySet<string> = new Set();
   private resizeObserver: ResizeObserver;
+  /** Nom normalisé de l'artiste à atteindre (mode jeu), dessiné dans sa propre couleur. */
+  private targetName = "";
 
   constructor(
     private readonly container: HTMLElement,
@@ -143,6 +148,11 @@ export class MapView {
     }
   }
 
+  /** Artiste à atteindre (mode jeu) ; "" pour aucun. */
+  setTarget(name: string): void {
+    this.targetName = name ? normalizeName(name) : "";
+  }
+
   fit(durationMs = 600): void {
     this.focusIds = new Set();
     this.zoomToFit(durationMs);
@@ -203,7 +213,8 @@ export class MapView {
     ctx.lineWidth = fontSize / 4;
     ctx.strokeStyle = this.theme.halo;
     ctx.strokeText(node.name, x, y);
-    ctx.fillStyle = this.theme.colors[nodeKind(node)];
+    const isTarget = this.targetName !== "" && normalizeName(node.name) === this.targetName;
+    ctx.fillStyle = isTarget ? this.theme.target : this.theme.colors[nodeKind(node)];
     ctx.fillText(node.name, x, y);
   }
 }

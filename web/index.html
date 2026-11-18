@@ -21,6 +21,11 @@
     <header id="title"><h1>furzr</h1></header>
 
     <form id="artist-form" class="floating" autocomplete="off">
+      <!-- explorer librement ou jouer : deux usages distincts, au-dessus du champ -->
+      <div id="play-switch" class="segmented" role="group" aria-label="Explore or play" data-i18n-attr="aria-label:play.label">
+        <button type="button" class="button" data-play="explore" aria-pressed="true" data-i18n="play.explore">Explore</button>
+        <button type="button" class="button" data-play="game" aria-pressed="false" data-i18n="play.game">Play</button>
+      </div>
       <button id="sound-toggle" type="button" class="button icon" aria-pressed="true" title="Sound on/off" data-i18n-attr="title:sound.toggle">
         <img src="volume_on.png" alt="Sound on" />
       </button>
@@ -30,7 +35,8 @@
         <option value="influences" data-i18n="mode.influences">Influences</option>
         <option value="movies" data-i18n="mode.movies">Movies</option>
       </select>
-      <span><input id="artist-input" type="search" placeholder="Give a music artist name here" aria-label="Artist name" data-i18n-attr="aria-label:input.label" /></span>
+      <span id="game-goal" role="status" hidden></span>
+      <span id="input-box"><input id="artist-input" type="search" placeholder="Give a music artist name here" aria-label="Artist name" data-i18n-attr="aria-label:input.label" /></span>
     </form>
 
     <span id="lang-box">
@@ -59,6 +65,10 @@
             Three modes: <b>Similar</b> artists, <b>Influences</b> (who inspired an artist, and whom they inspired) and,
             when available, <b>Movies</b> (recommended films).
           </p>
+          <p data-i18n-html="about.gameHtml">
+            <b>Game</b>: link two well-known artists, far apart from each other, with the shortest possible snake.
+            The best is 2 clicks for 1000 points; every extra click halves the score.
+          </p>
           <p data-i18n-html="about.creditsHtml">
             <b>furzr</b> uses data from <a href="https://www.last.fm" target="_blank" rel="noopener">Last.fm</a>,
             <a href="https://www.wikidata.org" target="_blank" rel="noopener">Wikidata</a> and
@@ -70,6 +80,7 @@
             <span class="dot input"></span> <span data-i18n="legend.input">your artists</span>
             <span class="dot exploded"></span> <span data-i18n="legend.exploded">explored</span>
             <span class="dot similar"></span> <span data-i18n="legend.similar">similar</span>
+            <span class="dot target"></span> <span data-i18n="legend.target">target (game)</span>
           </p>
           <p class="copyright">© 2013-2026 furzr</p>
         </section>
@@ -120,6 +131,39 @@
     </div>
 
     <div id="toasts" aria-live="polite"></div>
+    <div id="artist-tip" role="tooltip" hidden></div>
+
+    <!-- victoire du mode jeu : par-dessus toute l'application (top layer de <dialog>) -->
+    <dialog id="victory" aria-labelledby="victory-title">
+      <canvas id="confetti" aria-hidden="true"></canvas>
+      <div class="victory-card">
+        <svg class="victory-trophy" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+          <path d="M18 8h28v14c0 9-6 16-14 16s-14-7-14-16z" fill="#f5b400" />
+          <path d="M18 12H8v4c0 7 5 12 12 12M46 12h10v4c0 7-5 12-12 12" fill="none" stroke="#f5b400" stroke-width="4" />
+          <path d="M28 38h8v10h-8z" fill="#e0a000" />
+          <path d="M20 48h24v8H20z" fill="#c98f00" />
+          <path d="M26 14l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" fill="#fff6c8" transform="translate(6 0)" />
+        </svg>
+        <h2 id="victory-title"></h2>
+        <p id="victory-subtitle"></p>
+        <ol id="victory-path" aria-label="Your path" data-i18n-attr="aria-label:victory.path"></ol>
+        <dl class="victory-stats">
+          <div><dt data-i18n="victory.score">Score</dt><dd id="victory-score"></dd></div>
+          <div><dt data-i18n="victory.clicks">Clicks</dt><dd id="victory-clicks"></dd></div>
+          <div class="victory-level">
+            <dt data-i18n="victory.difficulty">Difficulty</dt><dd id="victory-difficulty"></dd><dd id="victory-par"></dd>
+          </div>
+          <div><dt data-i18n="victory.best">Best</dt><dd id="victory-best"></dd></div>
+        </dl>
+        <p id="victory-record" hidden data-i18n="game.record">New personal best!</p>
+        <div class="victory-actions">
+          <button id="victory-share" type="button" class="button primary" autofocus data-i18n="victory.share">Share</button>
+          <button id="victory-new" type="button" class="button" data-i18n="game.new">New challenge</button>
+          <button id="victory-close" type="button" class="button" data-i18n="victory.close">Close</button>
+        </div>
+        <p id="victory-feedback" class="feedback" role="status" hidden></p>
+      </div>
+    </dialog>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

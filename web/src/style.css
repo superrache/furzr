@@ -17,6 +17,7 @@
   --node-input: #de00ff;
   --node-exploded: #2572b8;
   --node-similar: #ff5500;
+  --node-target: #13a10e;
 
   --transition: 0.6s ease;
 }
@@ -194,6 +195,43 @@ input:focus {
   margin-left: 5px;
 }
 
+/* Explorer | Jouer : interrupteur sur sa propre ligne, au-dessus du champ */
+#play-switch {
+  display: flex;
+  margin-bottom: 5px;
+  font-size: 0.85em;
+}
+
+.start #play-switch {
+  justify-content: center;
+  font-size: 0.7em;
+}
+
+#artist-form #play-switch .button {
+  float: none;
+  margin: 0;
+  height: auto;
+  padding: 3px 14px;
+}
+
+/* sur la carte (écran large) : à gauche, sur la ligne des boutons ; le formulaire s'élargit d'autant */
+@media (min-width: 721px) {
+  body:not(.start) #artist-form {
+    width: min(540px, calc(100vw - 230px));
+  }
+
+  body:not(.start) #play-switch {
+    float: left;
+    margin: 0 5px 0 0;
+    font-size: inherit;
+  }
+
+  body:not(.start) #artist-form #play-switch .button {
+    height: calc(1.3em + 12px);
+    padding: 0 10px;
+  }
+}
+
 /* sélecteur de mode, rangé à droite avec les boutons */
 #mode {
   font: inherit;
@@ -211,6 +249,64 @@ input:focus {
 #artist-form span {
   display: block;
   overflow: hidden;
+}
+
+#artist-form span[hidden] {
+  display: none;
+}
+
+/* mode jeu : défi « A → B · score » sur sa propre ligne, sous les boutons (passe à la ligne au besoin) */
+#artist-form #game-goal {
+  clear: both;
+  margin-top: 5px;
+}
+
+#game-goal {
+  box-sizing: border-box;
+  min-height: calc(1.3em + 12px);
+  line-height: 1.3em;
+  padding: 6px 8px;
+  overflow-wrap: anywhere;
+  background: var(--surface);
+  border-radius: 3px;
+}
+
+/* noms du défi : infobulle au survol, au focus ou à l'appui */
+#game-goal .from,
+#game-goal .to {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  border-radius: 2px;
+}
+
+#game-goal .from:focus-visible,
+#game-goal .to:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+#game-goal .from {
+  color: var(--node-input);
+}
+
+#game-goal .to {
+  color: var(--node-target);
+}
+
+#artist-form #game-goal .status span {
+  display: inline;
+  white-space: nowrap;
+}
+
+#artist-form #game-goal .status {
+  display: inline;
+  opacity: 0.8;
+}
+
+/* en jeu, le formulaire est plus haut (ligne du défi) : messages en dessous */
+body.game:not(.start) #toasts {
+  top: 85px;
 }
 
 /* auto-complétion */
@@ -405,6 +501,10 @@ body:not(.start) #title {
   background: var(--node-exploded);
 }
 
+.dot.target {
+  background: var(--node-target);
+}
+
 .dot.similar {
   background: var(--node-similar);
 }
@@ -594,7 +694,7 @@ body:not(.start) #title {
 
   #tools {
     bottom: auto;
-    top: 64px;
+    top: 96px; /* sous le formulaire (interrupteur Explorer / Jouer + saisie) */
     left: 50px;
   }
 
@@ -629,9 +729,19 @@ body:not(.start) #title {
   }
 
   #toasts {
+    top: 140px;
     right: 16px;
     left: 16px;
     width: auto;
+  }
+
+  /* en jeu, sous la ligne du défi */
+  body.game:not(.start) #tools {
+    top: 140px;
+  }
+
+  body.game:not(.start) #toasts {
+    top: 185px;
   }
 }
 
@@ -640,4 +750,240 @@ body:not(.start) #title {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* ---------- victoire du mode jeu ---------- */
+
+/* le <dialog> couvre tout l'écran (confettis), la carte de résultat est centrée */
+#victory {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+#victory[open] {
+  display: flex;
+}
+
+#victory::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#confetti {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.victory-card {
+  position: relative;
+  width: min(440px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px 20px 18px;
+  text-align: center;
+  color: var(--text);
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  animation: victory-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+@keyframes victory-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+.victory-trophy {
+  display: block;
+  margin: 0 auto;
+  animation: victory-bounce 1.2s ease-in-out 0.4s 2;
+}
+
+@keyframes victory-bounce {
+  50% {
+    transform: translateY(-10px) rotate(-8deg);
+  }
+}
+
+#victory-title {
+  margin: 8px 0 4px;
+  font-size: 1.8em;
+}
+
+#victory-subtitle {
+  margin: 0 0 14px;
+}
+
+/* chemin : étiquettes reliées par des flèches, aux couleurs de la carte */
+#victory-path {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  font-weight: bold;
+}
+
+#victory-path li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#victory-path .chip {
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: white;
+  background: var(--node-exploded);
+}
+
+#victory-path li:first-child .chip {
+  background: var(--node-input);
+}
+
+#victory-path li:last-child .chip {
+  background: var(--node-target);
+}
+
+.victory-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.victory-stats div {
+  flex: 1 1 70px;
+  padding: 8px 4px;
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.victory-stats dt {
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+.victory-stats dd {
+  margin: 2px 0 0;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--accent-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+/* difficulté : un mot (« Extrême ») plutôt qu'un nombre, et le par en dessous */
+.victory-stats #victory-difficulty {
+  font-size: 1.05em;
+  line-height: 1.6em;
+}
+
+.victory-stats #victory-par {
+  font-size: 0.75em;
+  font-weight: normal;
+  color: var(--text);
+  opacity: 0.8;
+}
+
+#victory-record {
+  margin: 0 0 12px;
+  font-weight: bold;
+  color: var(--node-target);
+}
+
+.victory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.victory-actions .button {
+  background: var(--panel);
+}
+
+.victory-actions .button.primary {
+  color: white;
+  background: var(--accent-dark);
+}
+
+.victory-actions .button:hover:not(:disabled),
+.victory-actions .button:focus-visible {
+  color: white;
+  background: var(--accent);
+}
+
+/* ---------- infobulle d'artiste (mode jeu) ---------- */
+
+#artist-tip {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  gap: 10px;
+  width: min(360px, calc(100vw - 16px));
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 0.9em;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border-radius: 6px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+#artist-tip[hidden] {
+  display: none;
+}
+
+#artist-tip .tip-image {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+#artist-tip .tip-text {
+  min-width: 0;
+}
+
+#artist-tip strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 1.1em;
+  color: var(--accent-dark);
+}
+
+#artist-tip .tip-tags {
+  margin: 0 0 4px;
+  color: var(--accent-dark);
+}
+
+#artist-tip .tip-bio {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
 }
