@@ -23,6 +23,8 @@ export const pl: Messages = {
   "play.explore": "Odkrywaj",
   "play.game": "Graj",
   "mode.confirmSwitch": "Zmiana trybu wyczyści obecną mapę. Kontynuować?",
+  "confirm.continue": "Kontynuuj",
+  "confirm.cancel": "Anuluj",
 
   "input.label": "Nazwa artysty",
   "input.artist": "Wpisz tutaj nazwę artysty",
@@ -36,7 +38,7 @@ export const pl: Messages = {
   "about.howto":
     "Wpisz artystę, a następnie kliknij dowolną nazwę, aby rozbudować mapę. Przeciągaj nazwy, przewijaj lub zsuwaj palce, aby powiększyć.",
   "about.growthHtml":
-    "<b>Wąż</b> (Crazy Snake) zachowuje tylko przebytą ścieżkę: nieodkryte nazwy znikają przy każdym kroku. <b>Drzewo</b> (Huge Tree of Death) niczego nie usuwa i pozwala mapie rosnąć bez końca.",
+    "<b>Wąż</b> zachowuje tylko przebytą ścieżkę: nieodkryte nazwy znikają przy każdym kroku. <b>Drzewo</b> niczego nie usuwa i pozwala mapie rosnąć bez końca.",
   "about.modesHtml":
     "Trzy tryby: <b>Podobni</b> artyści, <b>Inspiracje</b> (kto zainspirował artystę i kogo on zainspirował) oraz, jeśli dostępne, <b>Filmy</b> (polecane filmy).",
   "about.gameHtml":
@@ -49,6 +51,7 @@ export const pl: Messages = {
   "legend.target": "cel (gra)",
 
   "share.tab": "Udostępnij mapę",
+  "panel.close": "Zamknij",
   "share.copy": "Kopiuj link",
   "share.native": "Udostępnij…",
   "share.urlLabel": "Link do tej mapy",
@@ -110,8 +113,8 @@ export const pl: Messages = {
   "growth.label": "Wzrost mapy",
   "growth.snake": "Wąż",
   "growth.tree": "Drzewo",
-  "growth.snakeTitle": "Crazy Snake: nieodkryte nazwy znikają przy każdym kroku, zostaje tylko twoja ścieżka",
-  "growth.treeTitle": "Huge Tree of Death: nic nie jest usuwane, mapa wciąż rośnie",
+  "growth.snakeTitle": "Nieodkryte nazwy znikają przy każdym kroku, zostaje tylko twoja ścieżka",
+  "growth.treeTitle": "Nic nie jest usuwane, mapa wciąż rośnie",
   "growth.toSnake": "Wąż: nieodkryte nazwy znikną przy następnym kliknięciu",
   "growth.toTree": "Drzewo: od teraz nic nie jest usuwane z mapy",
   "clear": "Wyczyść mapę",

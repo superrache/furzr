@@ -7,11 +7,12 @@ cd web
 npm install
 npm run dev      # development server
 npm test         # unit tests
+npm run test:e2e # end-to-end tests (Playwright; first run: npx playwright install chromium)
 npm run build    # static site in web/dist
 ```
 
 Three modes: **similar** artists, **influences** (who inspired an artist, and whom they inspired) and **movies**.
-Two ways to grow the map: **Snake** (Crazy Snake, unexplored names vanish at each step) or **Tree** (Huge Tree of Death, nothing is removed).
+Two ways to grow the map: **Snake** (unexplored names vanish at each step) or **Tree** (nothing is removed).
 
 Data: [Last.fm API](https://www.last.fm/api) (similar artists, bios), [Deezer API](https://developers.deezer.com/api)
 (audio previews, pictures, autocomplete), [Wikidata](https://www.wikidata.org) (influences) and
@@ -20,7 +21,7 @@ Data: [Last.fm API](https://www.last.fm/api) (similar artists, bios), [Deezer AP
 The interface is available in 12 languages (those for which Last.fm provides artist bios), detected from the browser
 and switchable from the language menu.
 
-**Game mode** (the *Play* switch above the search field): furzr picks two well-known artists far apart from each other; link them with the shortest possible
+**Game mode** (the _Play_ switch above the search field): furzr picks two well-known artists far apart from each other; link them with the shortest possible
 snake. Each challenge is rated from easy to extreme (estimated distance between the two artists), which sets a
 target number of clicks: 1000 to 4000 points at the target, 20% less for every extra click. When you win, the map first
 shows your winning path (and confetti), then the result card opens; "View the map" brings you back to the path.

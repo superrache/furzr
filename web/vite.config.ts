@@ -5,5 +5,7 @@ export default defineConfig({
   base: "./",
   test: {
     environment: "node",
+    // tests unitaires seulement : e2e/ appartient à Playwright (npm run test:e2e)
+    include: ["src/**/*.test.ts"],
   },
 });

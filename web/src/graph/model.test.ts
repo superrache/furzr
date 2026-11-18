@@ -17,7 +17,7 @@ describe("ArtistMap", () => {
     expect([map.artistA, map.artistB]).toEqual(["Radiohead", "Radiohead"]);
   });
 
-  it("prunes unexplored similars on each expansion (crazy snake)", () => {
+  it("prunes unexplored similars on each expansion (snake mode)", () => {
     const map = new ArtistMap();
     map.addInput(a("Radiohead"), [a("Muse"), a("Blur")], 10);
     map.markExplored("muse");
@@ -30,7 +30,7 @@ describe("ArtistMap", () => {
     expect([map.artistA, map.artistB]).toEqual(["Radiohead", "Muse"]);
   });
 
-  it("keeps every node in tree mode (Huge Tree of Death), and prunes again back in snake mode", () => {
+  it("keeps every node in tree mode, and prunes again back in snake mode", () => {
     const map = new ArtistMap();
     map.growth = "tree";
     map.addInput(a("Radiohead"), [a("Muse"), a("Blur")], 10);

@@ -45,7 +45,7 @@ describe("share links", () => {
   });
 });
 
-describe("legacy crazy snakes", () => {
+describe("legacy saved maps", () => {
   it("converts the 2013 csJSON format", () => {
     const legacy = {
       api: "lastfm",

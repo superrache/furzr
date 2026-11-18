@@ -4,17 +4,19 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "d3-force-3d": "3.0.6",
     "force-graph": "1.52.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "typescript": "7.0.2",
     "vite": "8.3.5",
     "vitest": "4.1.12"

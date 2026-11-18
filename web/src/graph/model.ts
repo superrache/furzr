@@ -28,8 +28,8 @@ export type NodeKind = "input" | "exploded" | "similar";
 
 /**
  * Croissance de la carte, comme les deux modes d'origine :
- * - "snake" (Crazy Snake) : à chaque expansion, les similaires non explorés disparaissent ;
- * - "tree" (Huge Tree of Death) : rien n'est élagué, l'arbre grossit sans fin.
+ * - "snake" (serpent) : à chaque expansion, les similaires non explorés disparaissent ;
+ * - "tree" (arbre) : rien n'est élagué, l'arbre grossit sans fin.
  */
 export type Growth = "snake" | "tree";
 
@@ -68,7 +68,7 @@ const linkKey = (a: string, b: string) => (a < b ? `${a}\u0001${b}` : `${b}\u000
  * - chaque artiste saisi est un nœud « input » ;
  * - cliquer un nœud l'« explore » : ses similaires sont ajoutés ;
  * - à chaque expansion, les similaires non explorés des expansions
- *   précédentes sont élagués : reste le chemin (le « crazy snake »)
+ *   précédentes sont élagués : reste le chemin parcouru (le serpent)
  *   entre l'artiste A (premier saisi) et B (dernier exploré).
  */
 export class ArtistMap {

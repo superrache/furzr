@@ -64,7 +64,7 @@ export async function decodeSnapshot(encoded: string): Promise<MapSnapshot | nul
   }
 }
 
-/** Nœud de l'ancien format « crazy snake » (furzr 2013-2015, servlet savecs). */
+/** Nœud de l'ancien format de carte sauvegardée (furzr 2013-2015, servlet savecs). */
 interface LegacySnakeNode {
   id?: string;
   mbid?: string;
@@ -75,7 +75,7 @@ interface LegacySnakeNode {
 }
 
 /**
- * Convertit un crazy snake de l'ancien furzr (champ csJSON stocké dans le Datastore)
+ * Convertit une carte sauvegardée par l'ancien furzr (champ csJSON stocké dans le Datastore)
  * vers le nouveau format, pour pouvoir réimporter d'anciennes cartes.
  */
 export function fromLegacySnake(legacy: {

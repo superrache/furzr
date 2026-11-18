@@ -23,6 +23,8 @@ export const es: Messages = {
   "play.explore": "Explorar",
   "play.game": "Jugar",
   "mode.confirmSwitch": "Cambiar de modo borra el mapa actual. ¿Continuar?",
+  "confirm.continue": "Continuar",
+  "confirm.cancel": "Cancelar",
 
   "input.label": "Nombre del artista",
   "input.artist": "Escribe aquí el nombre de un artista",
@@ -36,7 +38,7 @@ export const es: Messages = {
   "about.howto":
     "Escribe un artista y luego haz clic en cualquier nombre para ampliar el mapa. Arrastra los nombres, desplázate o pellizca para hacer zoom.",
   "about.growthHtml":
-    "<b>Serpiente</b> (Crazy Snake) solo conserva el camino recorrido: los nombres no explorados desaparecen en cada paso. <b>Árbol</b> (Huge Tree of Death) no elimina nada y deja que el mapa crezca sin fin.",
+    "<b>Serpiente</b> solo conserva el camino recorrido: los nombres no explorados desaparecen en cada paso. <b>Árbol</b> no elimina nada y deja que el mapa crezca sin fin.",
   "about.modesHtml":
     "Tres modos: artistas <b>Similares</b>, <b>Influencias</b> (quién inspiró a un artista y a quién inspiró él) y, si está disponible, <b>Películas</b> (películas recomendadas).",
   "about.gameHtml":
@@ -49,6 +51,7 @@ export const es: Messages = {
   "legend.target": "objetivo (juego)",
 
   "share.tab": "Compartir este mapa",
+  "panel.close": "Cerrar",
   "share.copy": "Copiar enlace",
   "share.native": "Compartir…",
   "share.urlLabel": "Enlace a este mapa",
@@ -110,8 +113,8 @@ export const es: Messages = {
   "growth.label": "Crecimiento del mapa",
   "growth.snake": "Serpiente",
   "growth.tree": "Árbol",
-  "growth.snakeTitle": "Crazy Snake: los nombres no explorados desaparecen en cada paso, solo queda tu camino",
-  "growth.treeTitle": "Huge Tree of Death: no se elimina nada, el mapa sigue creciendo",
+  "growth.snakeTitle": "Los nombres no explorados desaparecen en cada paso, solo queda tu camino",
+  "growth.treeTitle": "No se elimina nada, el mapa sigue creciendo",
   "growth.toSnake": "Serpiente: los nombres no explorados desaparecerán en tu próximo clic",
   "growth.toTree": "Árbol: a partir de ahora, no se elimina nada del mapa",
   "clear": "Borrar el mapa",

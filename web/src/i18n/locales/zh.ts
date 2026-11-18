@@ -23,6 +23,8 @@ export const zh: Messages = {
   "play.explore": "探索",
   "play.game": "游戏",
   "mode.confirmSwitch": "切换模式会清空当前地图。是否继续？",
+  "confirm.continue": "继续",
+  "confirm.cancel": "取消",
 
   "input.label": "艺人名称",
   "input.artist": "在此输入艺人名称",
@@ -35,7 +37,7 @@ export const zh: Messages = {
     "<b>furzr</b> 提供一种独特的方式来探索音乐世界：浏览艺人与乐队之间的关联并试听片段。让你的音乐知识像树枝一样生长，发现你接下来会听的音乐。",
   "about.howto": "输入一位艺人，然后点击任意名称来扩展地图。可以拖动名称，滚动或双指缩放。",
   "about.growthHtml":
-    "<b>蛇形</b>（Crazy Snake）只保留你走过的路径：未探索的名称在每一步都会消失。<b>树形</b>（Huge Tree of Death）不删除任何内容，地图会无限生长。",
+    "<b>蛇形</b>只保留你走过的路径：未探索的名称在每一步都会消失。<b>树形</b>不删除任何内容，地图会无限生长。",
   "about.modesHtml":
     "三种模式：<b>相似</b>艺人、<b>影响</b>（谁影响了这位艺人，以及他影响了谁），以及可用时的<b>电影</b>（推荐电影）。",
   "about.gameHtml":
@@ -48,6 +50,7 @@ export const zh: Messages = {
   "legend.target": "目标（游戏）",
 
   "share.tab": "分享此地图",
+  "panel.close": "关闭",
   "share.copy": "复制链接",
   "share.native": "分享…",
   "share.urlLabel": "此地图的链接",
@@ -109,8 +112,8 @@ export const zh: Messages = {
   "growth.label": "地图生长方式",
   "growth.snake": "蛇形",
   "growth.tree": "树形",
-  "growth.snakeTitle": "Crazy Snake：未探索的名称在每一步都会消失，只留下你的路径",
-  "growth.treeTitle": "Huge Tree of Death：不删除任何内容，地图持续生长",
+  "growth.snakeTitle": "未探索的名称在每一步都会消失，只留下你的路径",
+  "growth.treeTitle": "不删除任何内容，地图持续生长",
   "growth.toSnake": "蛇形：下次点击时未探索的名称将会消失",
   "growth.toTree": "树形：从现在起，地图上的内容不会再被删除",
   "clear": "清空地图",

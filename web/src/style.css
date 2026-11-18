@@ -30,6 +30,8 @@
   --node-target: #3cc83a;
 
   --transition: 0.6s ease;
+  /* ouverture des panneaux (volets, fiche « À propos ») : plus vive que le reste */
+  --panel-transition: 0.25s ease-out;
 }
 
 * {
@@ -45,6 +47,13 @@ body {
   font-size: 14px;
   color: var(--text);
   background: var(--map-bg);
+}
+
+/* body contient tous les éléments positionnés et coupe ce qui dépasse : sans ça, les panneaux escamotés
+   hors écran (à droite) élargissent la page, et Chrome mobile la dézoome pour tout montrer (707 px au
+   lieu de 390) */
+body {
+  position: relative;
 }
 
 a {
@@ -407,8 +416,8 @@ body:not(.start) #title {
   padding: 6px;
   border-radius: 5px;
   transition:
-    transform var(--transition),
-    background-color var(--transition);
+    transform var(--panel-transition),
+    background-color var(--panel-transition);
 }
 
 .drawer.open {
@@ -425,6 +434,12 @@ body:not(.start) #title {
 
 .drawer-content {
   width: 380px;
+}
+
+/* icône de l'onglet et bouton × : petit écran seulement (fenêtres flottantes) */
+.tab-icon,
+.drawer-close {
+  display: none;
 }
 
 .box {
@@ -476,8 +491,8 @@ body:not(.start) #title {
   grid-template-rows: 0fr;
   visibility: hidden;
   transition:
-    grid-template-rows var(--transition),
-    visibility var(--transition);
+    grid-template-rows var(--panel-transition),
+    visibility var(--panel-transition);
 }
 
 .drawer-bottom .drawer-content > * {
@@ -791,16 +806,138 @@ body:not(.start) #title {
     font-size: 1.2em;
   }
 
-  .drawer-content {
-    width: min(380px, calc(100vw - 70px));
+  /* « furzr » et « Partager » : plus de volets qui glissent, mais deux boutons rangés sous le sélecteur
+     de langue, qui ouvrent chacun une fenêtre flottante centrée (setupDrawers gère la fermeture) */
+  .drawer-left,
+  .drawer-right,
+  .drawer-left.open,
+  .drawer-right.open {
+    position: static;
+    padding: 0;
+    transform: none;
+    background: none;
+    transition: none;
   }
 
-  .drawer-left {
-    top: 64px;
+  .drawer-left .drawer-tab,
+  .drawer-right .drawer-tab {
+    position: absolute;
+    z-index: 22;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 30px;
+    padding: 0;
+    writing-mode: horizontal-tb;
+    transform: none;
+    color: var(--accent-text);
+    background: var(--panel);
+    border-radius: 5px;
   }
 
-  .drawer-right {
-    top: 64px;
+  .drawer-left .drawer-tab {
+    top: 46px;
+  }
+
+  .drawer-left .drawer-tab h1 {
+    margin: 0;
+    font-size: 1.05em;
+    text-shadow: none;
+  }
+
+  .drawer-right .drawer-tab {
+    top: 82px;
+  }
+
+  .drawer-right .tab-icon {
+    display: block;
+  }
+
+  /* titre « Partager la carte » : lu par les lecteurs d'écran, pas affiché */
+  .drawer-right .drawer-tab h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .drawer-left .drawer-content,
+  .drawer-right .drawer-content {
+    display: none;
+  }
+
+  /* voile : pseudo-élément du panneau (un toucher dessus le ferme) */
+  .drawer-left.open::before,
+  .drawer-right.open::before {
+    content: "";
+    position: fixed;
+    z-index: 40;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .drawer-left.open .drawer-content,
+  .drawer-right.open .drawer-content {
+    position: fixed;
+    z-index: 41;
+    top: 50%;
+    left: 16px;
+    right: 16px;
+    display: block;
+    width: auto;
+    max-height: calc(100% - 32px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 10px;
+    background: var(--surface);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px var(--shadow);
+    transform: translateY(-50%);
+  }
+
+  .drawer-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    font: inherit;
+    font-size: 1.5em;
+    line-height: 1;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  /* dans la fenêtre : pas de second cadre, texte aligné à gauche (justifié, il laissait des trous) */
+  .drawer-left .box,
+  .drawer-right .box {
+    border: 0;
+    padding: 4px;
+    text-align: left;
+  }
+
+  /* les boutons se détachent du fond de la fenêtre (même couleur qu'eux sinon) */
+  .drawer-right .drawer-content .button {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+  }
+
+  /* le titre du contenu ne passe pas sous le bouton × */
+  .drawer-left .box h3,
+  .drawer-right .box h3 {
+    margin-top: 4px;
+    padding-right: 40px;
   }
 
   .drawer-bottom {
@@ -821,11 +958,60 @@ body:not(.start) #title {
     width: 100%;
   }
 
+  /* fiche de l'artiste : l'onglet a l'air d'un bouton (pas de survol sur mobile pour le deviner),
+     avec un chevron qui indique le sens d'ouverture */
+  .drawer-bottom .drawer-tab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 7px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+
+  .drawer-bottom .drawer-tab h2 {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 1.1em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-shadow: none;
+  }
+
+  .drawer-bottom .drawer-tab::after {
+    content: "";
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-top: 4px;
+    border-top: 2px solid var(--accent-text);
+    border-right: 2px solid var(--accent-text);
+    transform: rotate(-45deg); /* vers le haut : la fiche se déplie vers le haut */
+    transition: transform var(--panel-transition);
+  }
+
+  .drawer-bottom.open .drawer-tab::after {
+    margin-top: -4px;
+    transform: rotate(135deg);
+  }
+
+  .drawer-bottom .drawer-tab:active {
+    background: var(--input-bg);
+  }
+
+  .drawer-bottom .overview-detail {
+    margin-top: 8px;
+  }
+
   #tools {
     bottom: auto;
     /* sous le formulaire (interrupteur, saisie ou bandeau du défi), dont la hauteur varie */
     top: calc(5px + var(--form-height, 87px) + 4px);
-    left: 50px;
+    left: 3px;
   }
 
   /* sur mobile, le formulaire de la carte s'arrête avant le sélecteur de langue (largeur fixe) */
@@ -872,6 +1058,48 @@ body:not(.start) #title {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* ---------- confirmation (confirmDialog) ---------- */
+
+#confirm {
+  width: min(360px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px var(--shadow);
+}
+
+#confirm[open] {
+  animation: confirm-pop 0.2s ease-out;
+}
+
+@keyframes confirm-pop {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+}
+
+#confirm::backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.confirm-card {
+  padding: 18px 18px 14px;
+}
+
+#confirm-message {
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 /* ---------- victoire du mode jeu ---------- */
@@ -1054,17 +1282,21 @@ body:not(.start) #title {
   gap: 8px;
 }
 
-.victory-actions .button {
+.victory-actions .button,
+.confirm-actions .button {
   background: var(--panel);
 }
 
-.victory-actions .button.primary {
+.victory-actions .button.primary,
+.confirm-actions .button.primary {
   color: white;
   background: var(--accent-dark);
 }
 
 .victory-actions .button:hover:not(:disabled),
-.victory-actions .button:focus-visible {
+.victory-actions .button:focus-visible,
+.confirm-actions .button:hover:not(:disabled),
+.confirm-actions .button:focus-visible {
   color: white;
   background: var(--accent);
 }

@@ -23,6 +23,8 @@ export const pt: Messages = {
   "play.explore": "Explorar",
   "play.game": "Jogar",
   "mode.confirmSwitch": "Mudar de modo apaga o mapa atual. Continuar?",
+  "confirm.continue": "Continuar",
+  "confirm.cancel": "Cancelar",
 
   "input.label": "Nome do artista",
   "input.artist": "Digite aqui o nome de um artista",
@@ -36,7 +38,7 @@ export const pt: Messages = {
   "about.howto":
     "Digite um artista e clique em qualquer nome para expandir o mapa. Arraste os nomes, role ou faça pinça para dar zoom.",
   "about.growthHtml":
-    "<b>Cobra</b> (Crazy Snake) mantém apenas o caminho percorrido: os nomes não explorados somem a cada passo. <b>Árvore</b> (Huge Tree of Death) não remove nada e deixa o mapa crescer sem fim.",
+    "<b>Cobra</b> mantém apenas o caminho percorrido: os nomes não explorados somem a cada passo. <b>Árvore</b> não remove nada e deixa o mapa crescer sem fim.",
   "about.modesHtml":
     "Três modos: artistas <b>Semelhantes</b>, <b>Influências</b> (quem inspirou um artista e quem ele inspirou) e, quando disponível, <b>Filmes</b> (filmes recomendados).",
   "about.gameHtml":
@@ -49,6 +51,7 @@ export const pt: Messages = {
   "legend.target": "alvo (jogo)",
 
   "share.tab": "Compartilhar este mapa",
+  "panel.close": "Fechar",
   "share.copy": "Copiar link",
   "share.native": "Compartilhar…",
   "share.urlLabel": "Link para este mapa",
@@ -110,8 +113,8 @@ export const pt: Messages = {
   "growth.label": "Crescimento do mapa",
   "growth.snake": "Cobra",
   "growth.tree": "Árvore",
-  "growth.snakeTitle": "Crazy Snake: os nomes não explorados somem a cada passo, só o seu caminho fica",
-  "growth.treeTitle": "Huge Tree of Death: nada é removido, o mapa continua crescendo",
+  "growth.snakeTitle": "Os nomes não explorados somem a cada passo, só o seu caminho fica",
+  "growth.treeTitle": "Nada é removido, o mapa continua crescendo",
   "growth.toSnake": "Cobra: os nomes não explorados vão sumir no próximo clique",
   "growth.toTree": "Árvore: a partir de agora, nada é removido do mapa",
   "clear": "Limpar o mapa",

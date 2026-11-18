@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { areFarApart, estimateDifficulty, parFor, pickChallenge, popularPool, scoreFor } from "./game";
+import { areFarApart, estimateDifficulty, parFor, shareGenre, pickChallenge, popularPool, scoreFor } from "./game";
 import { ArtistMap } from "../graph/model";
 import type { Artist } from "../api/types";
 
@@ -7,27 +7,40 @@ const a = (name: string): Artist => ({ id: name.toLowerCase(), name });
 
 describe("game", () => {
   it("scores 1000 points per difficulty level at par, then 20% less per extra click", () => {
-    expect([1, 2, 3, 4].map((d) => parFor(d as 1 | 2 | 3 | 4))).toEqual([2, 3, 4, 5]);
-    expect([2, 3, 4, 5].map((moves) => scoreFor(moves, 1))).toEqual([1000, 800, 640, 512]);
+    expect([1, 2, 3, 4].map((d) => parFor(d as 1 | 2 | 3 | 4))).toEqual([3, 4, 5, 6]);
+    expect([3, 4, 5, 6].map((moves) => scoreFor(moves, 1))).toEqual([1000, 800, 640, 512]);
     expect(scoreFor(1, 1)).toBe(1000); // mieux que le par : pas de bonus
-    expect(scoreFor(3, 4)).toBe(4000);
-    expect(scoreFor(16, 4)).toBe(344); // l'exemple qui donnait 1 point avec l'ancien barème
+    expect(scoreFor(6, 4)).toBe(4000);
+    expect(scoreFor(16, 4)).toBe(429); // 10 clics de plus que le par
     expect(scoreFor(80, 1)).toBe(1);
   });
 
   it("rates a challenge from the overlap of both neighbourhoods", async () => {
     // graphe : A → x1 → y1 ; B → z1 ; les rencontres sont ajoutées cas par cas
-    const rate = (graph: Record<string, string[]>, width = 16) =>
-      estimateDifficulty({ from: a("A"), to: a("B") }, async (artist) => (graph[artist.name] ?? []).map(a), width);
+    const rate = (graph: Record<string, string[]>, width = 16, tags?: Record<string, string[]>) =>
+      estimateDifficulty(
+        { from: a("A"), to: a("B") },
+        async (artist) => (graph[artist.name] ?? []).map(a),
+        width,
+        tags && (async (artist) => tags[artist.name] ?? []),
+      );
     const base = { A: ["x1"], x1: ["y1"], B: ["z1"], z1: ["w1"] };
     expect(await rate({ ...base, x1: ["y1", "B"] })).toBe(1); // B visible après un clic
     expect(await rate({ ...base, B: ["z1", "y1"] })).toBe(1); // A → x1 → y1 ~ B
-    expect(await rate({ ...base, z1: ["w1", "y1"] })).toBe(2); // A → x1 → y1 ~ z1 ~ B
-    expect(await rate({ ...base, x1: ["y1", "far"], z1: ["w1", "FAR"] }, 1)).toBe(3); // seulement hors de l'affichage
-    expect(await rate(base)).toBe(4);
+    expect(await rate({ ...base, z1: ["w1", "y1"] })).toBe(1); // A → x1 → y1 ~ z1 ~ B
+    expect(await rate({ ...base, x1: ["y1", "far"], z1: ["w1", "FAR"] }, 1)).toBe(2); // seulement hors de l'affichage
+    expect(await rate(base, 16, { A: ["Rock", "seen live"], B: ["rock"] })).toBe(3); // genre commun
+    expect(await rate(base, 16, { A: ["seen live", "pop"], B: ["seen live", "metal"] })).toBe(4);
+    expect(await rate(base)).toBe(4); // tags inconnus
     // un appel en échec compte comme une liste vide
     const failing = estimateDifficulty({ from: a("A"), to: a("B") }, () => Promise.reject(new Error("down")));
     expect(await failing).toBe(4);
+  });
+
+  it("compares genres, ignoring vague tags", () => {
+    expect(shareGenre(["Hip-Hop", "rap"], ["hip-hop"])).toBe(true);
+    expect(shareGenre(["seen live"], ["seen live"])).toBe(false);
+    expect(shareGenre([], ["rock"])).toBe(false);
   });
 
   it("keeps only well-known artists, without duplicates", () => {

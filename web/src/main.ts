@@ -8,7 +8,7 @@ import { ArtistMap, normalizeName, type Growth, type MapNode } from "./graph/mod
 import { decodeSnapshot, encodeSnapshot } from "./graph/share";
 import { MapView, themeFromCss } from "./graph/view";
 import { Autocomplete } from "./ui/autocomplete";
-import { byId, closeDrawers, exposeHeight, prefs, setupDrawers, toast } from "./ui/dom";
+import { byId, closeDrawers, confirmDialog, exposeHeight, prefs, setupDrawers, toast } from "./ui/dom";
 import { escapeHtml } from "./ui/html";
 import { ArtistTip } from "./ui/artist-tip";
 import { launchConfetti } from "./ui/confetti";
@@ -152,7 +152,7 @@ class App {
     this.modeSelect.addEventListener("change", () => this.onModeChange());
     for (const button of this.playButtons()) {
       button.addEventListener("click", () =>
-        this.switchMode(button.dataset.play === "game" ? this.modes.get("game")! : this.exploreMode),
+        void this.switchMode(button.dataset.play === "game" ? this.modes.get("game")! : this.exploreMode),
       );
     }
     this.setupLanguagePicker();
@@ -409,7 +409,12 @@ class App {
       return;
     }
     const width = Math.min(SIMILAR_NUMBER, ESTIMATE_WIDTH);
-    const promise = estimateDifficulty(challenge, (artist) => this.cachedSimilars(artist), width);
+    const promise = estimateDifficulty(
+      challenge,
+      (artist) => this.cachedSimilars(artist),
+      width,
+      async (artist) => (await this.cachedInfo(artist))?.tags ?? [],
+    );
     const entry: NonNullable<App["difficulty"]> = { challenge, level: null, promise };
     this.difficulty = entry;
     void promise.then((level) => {
@@ -780,6 +785,8 @@ class App {
     this.overviewArtist = artist;
     const overview = byId("overview");
     overview.hidden = false;
+    // le lecteur accompagne la fiche : à afficher même si le son est coupé (aucun état ne viendra du lecteur)
+    this.renderSound(this.soundStatus);
     byId("overview-name").textContent = artist.name;
     byId("overview-tags").textContent = "";
     byId("overview-bio").textContent = "";
@@ -1039,7 +1046,7 @@ class App {
   private onModeChange(): void {
     const next = this.modes.get(this.modeSelect.value as ModeId);
     if (next) {
-      this.switchMode(next);
+      void this.switchMode(next);
     }
   }
 
@@ -1054,11 +1061,11 @@ class App {
   }
 
   /** Les identifiants n'ont pas le même sens d'une source à l'autre : changer de mode vide la carte. */
-  private switchMode(next: Mode): void {
+  private async switchMode(next: Mode): Promise<void> {
     if (next === this.mode) {
       return;
     }
-    if (!this.map.isEmpty && !confirm(t("mode.confirmSwitch"))) {
+    if (!this.map.isEmpty && !(await confirmDialog(t("mode.confirmSwitch")))) {
       this.modeSelect.value = this.exploreMode.id;
       this.renderPlay();
       return;

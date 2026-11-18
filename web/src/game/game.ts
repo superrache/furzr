@@ -8,7 +8,7 @@ import { normalizeName } from "../graph/model";
  *   d'auditeurs (des artistes que le joueur a toutes les chances de connaître).
  * - « Éloignés » : aucun des deux n'est dans les 50 similaires de l'autre, et leurs listes de
  *   similaires n'ont aucun nom en commun. Il faut donc au moins 3 liens, soit 2 clics.
- * - Difficulté (1 à 4) estimée d'après les similaires de chacun sur deux niveaux : elle donne le
+ * - Difficulté (1 à 4) estimée d'après les similaires de chacun sur deux niveaux, puis les genres : elle donne le
  *   nombre de clics de référence (« par ») et le score maximal. Chaque clic au-delà du par
  *   retire 20 % du score.
  */
@@ -31,8 +31,8 @@ export const ESTIMATE_WIDTH = 16;
 /** 1 facile, 2 moyen, 3 difficile, 4 extrême. */
 export type Difficulty = 1 | 2 | 3 | 4;
 
-/** Clics attendus pour un joueur qui trouve le meilleur chemin : 2 à 5. */
-export const parFor = (difficulty: Difficulty): number => MIN_MOVES + difficulty - 1;
+/** Clics de référence : 3 à 6 (un défi facile se joue en général en 3 clics, rarement en 2). */
+export const parFor = (difficulty: Difficulty): number => MIN_MOVES + difficulty;
 
 export interface Challenge {
   from: Artist;
@@ -41,7 +41,7 @@ export interface Challenge {
 
 /**
  * 1000 points par niveau de difficulté si le joueur fait le par (ou mieux), puis −20 % par clic
- * de plus : 16 clics sur un défi extrême (par 5) valent encore 344 points. 1 point au plus bas.
+ * de plus : 16 clics sur un défi extrême (par 6) valent encore 429 points. 1 point au plus bas.
  */
 export function scoreFor(moves: number, difficulty: Difficulty): number {
   const extra = Math.max(0, moves - parFor(difficulty));
@@ -65,39 +65,57 @@ async function mapLimited<T, R>(items: T[], concurrency: number, fn: (item: T) =
   return results;
 }
 
+/** Tags trop vagues pour rapprocher deux artistes. */
+const VAGUE_TAGS = new Set(["seen live", "favorites", "favourites", "favorite", "love", "awesome"]);
+
+/** Vrai si les deux listes de tags (Last.fm, en anglais) ont un genre en commun. */
+export function shareGenre(tagsA: string[], tagsB: string[]): boolean {
+  const genres = (tags: string[]) => tags.map((t) => t.trim().toLowerCase()).filter((t) => t && !VAGUE_TAGS.has(t));
+  const b = new Set(genres(tagsB));
+  return genres(tagsA).some((t) => b.has(t));
+}
+
 /**
  * Difficulté d'un défi, d'après ce que le joueur voit : les `width` premiers similaires de chaque
- * nœud (16 par défaut sur la carte). A1/A2 = similaires de A à 1 et 2 liens, B1/B2 de même pour B.
- * La similarité Last.fm n'est pas symétrique, mais presque : « Y ∈ B1 » sert d'approximation
- * de « B est un similaire de Y ».
+ * nœud (16 par défaut sur la carte). A1/A2 = similaires de A à 1 et 2 liens, B1/B2 de même pour B ;
+ * A2⁺/B2⁺ = second niveau élargi aux 50 similaires. La similarité Last.fm n'est pas symétrique,
+ * mais presque : « Y ∈ B1 » sert d'approximation de « B est un similaire de Y ».
  *
- * - 1 facile (par 2) : B ∈ A2, ou A2 ∩ B1 ≠ ∅ (A → X → Y → B) ;
- * - 2 moyen (par 3) : A2 ∩ B2 ≠ ∅ (A → X → Y → Z → B) ;
- * - 3 difficile (par 4) : pas de rencontre dans ce qui est affiché, mais une rencontre en
- *   élargissant le second niveau aux 50 similaires (les deux univers se touchent) ;
- * - 4 extrême (par 5) : aucune rencontre, même élargie.
+ * Échelle calée sur des tirages réels (le tirage exclut déjà les paires proches : sur 30 défis,
+ * 5 faciles, 9 moyens, 3 difficiles, 13 extrêmes) :
+ * - 1 facile (par 3) : les deux univers se rencontrent dans ce qui est affiché (A2 ∩ B2 ≠ ∅,
+ *   ou plus près encore) ;
+ * - 2 moyen (par 4) : ils ne se rencontrent qu'en élargissant au moins un côté (A2⁺ ∩ B2⁺ ≠ ∅) ;
+ * - 3 difficile (par 5) : aucune rencontre, mais les deux artistes ont un genre en commun (tags) ;
+ * - 4 extrême (par 6) : aucune rencontre et aucun genre commun.
  *
- * Coût : 2 + 2 × width appels (mis en cache par l'appelant), dont au plus 6 en parallèle.
+ * Coût : 2 + 2 × width appels (mis en cache par l'appelant), dont au plus 6 en parallèle, plus les
+ * tags des deux artistes (fiches déjà préchargées pour l'infobulle). Sans `tags`, 3 devient 4.
  */
 export async function estimateDifficulty(
   challenge: Challenge,
   similars: (artist: Artist) => Promise<Artist[]>,
   width = ESTIMATE_WIDTH,
+  tags?: (artist: Artist) => Promise<string[]>,
 ): Promise<Difficulty> {
   const all = (artist: Artist) => similars(artist).catch((): Artist[] => []);
   const [a1, b1] = (await Promise.all([all(challenge.from), all(challenge.to)])).map((l) => l.slice(0, width));
   const [a2Full, b2Full] = await Promise.all([mapLimited(a1, 3, all), mapLimited(b1, 3, all)]);
   const shown = (lists: Artist[][]) => nameSet(lists.map((l) => l.slice(0, width)));
   const a2 = shown(a2Full);
-  if (a2.has(normalizeName(challenge.to.name)) || intersects(a2, nameSet([b1]))) {
+  if (a2.has(normalizeName(challenge.to.name)) || intersects(a2, nameSet([b1])) || intersects(a2, shown(b2Full))) {
     return 1;
   }
-  if (intersects(a2, shown(b2Full))) {
+  if (intersects(nameSet(a2Full), nameSet(b2Full))) {
     return 2;
   }
-  return intersects(nameSet(a2Full), nameSet(b2Full)) ? 3 : 4;
+  if (!tags) {
+    return 4;
+  }
+  const none = (): string[] => [];
+  const [tagsA, tagsB] = await Promise.all([tags(challenge.from).catch(none), tags(challenge.to).catch(none)]);
+  return shareGenre(tagsA, tagsB) ? 3 : 4;
 }
-
 
 /** Artistes assez connus pour le jeu, sans doublons. */
 export function popularPool(chart: { artist: Artist; listeners: number }[], minListeners = MIN_LISTENERS): Artist[] {

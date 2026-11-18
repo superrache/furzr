@@ -46,6 +46,7 @@
     <aside id="about" class="drawer drawer-left">
       <button class="drawer-tab" type="button" aria-expanded="false"><h1>furzr</h1></button>
       <div class="drawer-content">
+        <button class="drawer-close" type="button" aria-label="Close" title="Close" data-i18n-attr="aria-label:panel.close;title:panel.close">×</button>
         <section class="box">
           <h3 data-i18n="about.title">About this app</h3>
           <p data-i18n-html="about.introHtml">
@@ -57,8 +58,8 @@
             Type an artist, then click on any name to expand the map. Drag names around, scroll or pinch to zoom.
           </p>
           <p data-i18n-html="about.growthHtml">
-            <b>Snake</b> (Crazy Snake) keeps only the path you followed: unexplored names vanish at each step.
-            <b>Tree</b> (Huge Tree of Death) removes nothing and lets the map grow forever.
+            <b>Snake</b> keeps only the path you followed: unexplored names vanish at each step.
+            <b>Tree</b> removes nothing and lets the map grow forever.
           </p>
           <p data-i18n-html="about.modesHtml">
             Three modes: <b>Similar</b> artists, <b>Influences</b> (who inspired an artist, and whom they inspired) and,
@@ -87,8 +88,18 @@
     </aside>
 
     <aside id="share" class="drawer drawer-right">
-      <button class="drawer-tab" type="button" aria-expanded="false"><h2 data-i18n="share.tab">Share this map</h2></button>
+      <button class="drawer-tab" type="button" aria-expanded="false">
+        <!-- sur mobile, l'onglet est un bouton icône (le titre reste lu par les lecteurs d'écran) -->
+        <svg class="tab-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="18" cy="5" r="3" fill="currentColor" />
+          <circle cx="6" cy="12" r="3" fill="currentColor" />
+          <circle cx="18" cy="19" r="3" fill="currentColor" />
+          <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <h2 data-i18n="share.tab">Share this map</h2>
+      </button>
       <div class="drawer-content">
+        <button class="drawer-close" type="button" aria-label="Close" title="Close" data-i18n-attr="aria-label:panel.close;title:panel.close">×</button>
         <section class="box">
           <h3 id="map-description">Expand your artist map</h3>
           <div class="share-actions">
@@ -119,10 +130,10 @@
     <div id="tools" class="floating">
       <span class="segmented" role="group" aria-label="Map growth" data-i18n-attr="aria-label:growth.label">
         <button type="button" class="button" data-growth="snake" aria-pressed="true"
-          title="Crazy Snake: unexplored names vanish at each step, only your path remains"
+          title="Unexplored names vanish at each step, only your path remains"
           data-i18n="growth.snake" data-i18n-attr="title:growth.snakeTitle">Snake</button>
         <button type="button" class="button" data-growth="tree" aria-pressed="false"
-          title="Huge Tree of Death: nothing is removed, the map keeps growing"
+          title="Nothing is removed, the map keeps growing"
           data-i18n="growth.tree" data-i18n-attr="title:growth.treeTitle">Tree</button>
       </span>
       <button id="clear" type="button" class="button" data-i18n="clear">Clear the map</button>
@@ -138,6 +149,17 @@
     <div id="artist-tip" role="tooltip" hidden></div>
 
     <!-- victoire du mode jeu : par-dessus toute l'application (top layer de <dialog>) -->
+    <!-- confirmation (remplace confirm() du navigateur) : petit panneau centré, voir confirmDialog() -->
+    <dialog id="confirm" aria-labelledby="confirm-message">
+      <form method="dialog" class="confirm-card">
+        <p id="confirm-message"></p>
+        <div class="confirm-actions">
+          <button id="confirm-cancel" type="submit" value="cancel" class="button" data-i18n="confirm.cancel">Cancel</button>
+          <button id="confirm-ok" type="submit" value="ok" class="button primary" data-i18n="confirm.continue">Continue</button>
+        </div>
+      </form>
+    </dialog>
+
     <!-- confettis : d'abord sur la carte, puis déplacés dans la fenêtre de victoire à son ouverture -->
     <canvas id="confetti" aria-hidden="true"></canvas>
     <dialog id="victory" aria-labelledby="victory-title">

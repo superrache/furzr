@@ -23,6 +23,8 @@ export const de: Messages = {
   "play.explore": "Erkunden",
   "play.game": "Spielen",
   "mode.confirmSwitch": "Beim Wechsel des Modus wird die aktuelle Karte gelöscht. Fortfahren?",
+  "confirm.continue": "Fortfahren",
+  "confirm.cancel": "Abbrechen",
 
   "input.label": "Name des Künstlers",
   "input.artist": "Gib hier einen Künstlernamen ein",
@@ -36,7 +38,7 @@ export const de: Messages = {
   "about.howto":
     "Gib einen Künstler ein und klicke dann auf einen Namen, um die Karte zu erweitern. Ziehe Namen umher, scrolle oder zoome mit zwei Fingern.",
   "about.growthHtml":
-    "<b>Schlange</b> (Crazy Snake) behält nur den Weg, dem du gefolgt bist: Nicht erkundete Namen verschwinden bei jedem Schritt. <b>Baum</b> (Huge Tree of Death) entfernt nichts und lässt die Karte endlos wachsen.",
+    "<b>Schlange</b> behält nur den Weg, dem du gefolgt bist: Nicht erkundete Namen verschwinden bei jedem Schritt. <b>Baum</b> entfernt nichts und lässt die Karte endlos wachsen.",
   "about.modesHtml":
     "Drei Modi: <b>Ähnliche</b> Künstler, <b>Einflüsse</b> (wer einen Künstler inspiriert hat und wen er inspiriert hat) und, falls verfügbar, <b>Filme</b> (empfohlene Filme).",
   "about.gameHtml":
@@ -49,6 +51,7 @@ export const de: Messages = {
   "legend.target": "Ziel (Spiel)",
 
   "share.tab": "Karte teilen",
+  "panel.close": "Schließen",
   "share.copy": "Link kopieren",
   "share.native": "Teilen…",
   "share.urlLabel": "Link zu dieser Karte",
@@ -110,8 +113,8 @@ export const de: Messages = {
   "growth.label": "Wachstum der Karte",
   "growth.snake": "Schlange",
   "growth.tree": "Baum",
-  "growth.snakeTitle": "Crazy Snake: Nicht erkundete Namen verschwinden bei jedem Schritt, nur dein Weg bleibt",
-  "growth.treeTitle": "Huge Tree of Death: Nichts wird entfernt, die Karte wächst immer weiter",
+  "growth.snakeTitle": "Nicht erkundete Namen verschwinden bei jedem Schritt, nur dein Weg bleibt",
+  "growth.treeTitle": "Nichts wird entfernt, die Karte wächst immer weiter",
   "growth.toSnake": "Schlange: Nicht erkundete Namen verschwinden beim nächsten Klick",
   "growth.toTree": "Baum: Ab jetzt wird nichts mehr von der Karte entfernt",
   "clear": "Karte leeren",

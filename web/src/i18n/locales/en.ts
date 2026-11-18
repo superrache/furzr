@@ -30,6 +30,8 @@ export const en = {
   "play.explore": "Explore",
   "play.game": "Play",
   "mode.confirmSwitch": "Switching mode clears the current map. Continue?",
+  "confirm.continue": "Continue",
+  "confirm.cancel": "Cancel",
 
   "input.label": "Artist name",
   "input.artist": "Give a music artist name here",
@@ -42,7 +44,7 @@ export const en = {
     "<b>furzr</b> offers an original way to explore the world of music, browsing relationships between artists or bands and listening to samples. Expand your musical knowledge like the leaves of a tree and find out what you will be listening to soon.",
   "about.howto": "Type an artist, then click on any name to expand the map. Drag names around, scroll or pinch to zoom.",
   "about.growthHtml":
-    "<b>Snake</b> (Crazy Snake) keeps only the path you followed: unexplored names vanish at each step. <b>Tree</b> (Huge Tree of Death) removes nothing and lets the map grow forever.",
+    "<b>Snake</b> keeps only the path you followed: unexplored names vanish at each step. <b>Tree</b> removes nothing and lets the map grow forever.",
   "about.modesHtml":
     "Three modes: <b>Similar</b> artists, <b>Influences</b> (who inspired an artist, and whom they inspired) and, when available, <b>Movies</b> (recommended films).",
   "about.gameHtml":
@@ -55,6 +57,7 @@ export const en = {
   "legend.target": "target (game)",
 
   "share.tab": "Share this map",
+  "panel.close": "Close",
   "share.copy": "Copy link",
   "share.native": "Share…",
   "share.urlLabel": "Link to this map",
@@ -116,8 +119,8 @@ export const en = {
   "growth.label": "Map growth",
   "growth.snake": "Snake",
   "growth.tree": "Tree",
-  "growth.snakeTitle": "Crazy Snake: unexplored names vanish at each step, only your path remains",
-  "growth.treeTitle": "Huge Tree of Death: nothing is removed, the map keeps growing",
+  "growth.snakeTitle": "Unexplored names vanish at each step, only your path remains",
+  "growth.treeTitle": "Nothing is removed, the map keeps growing",
   "growth.toSnake": "Snake: unexplored names will vanish at your next click",
   "growth.toTree": "Tree: from now on, nothing is removed from the map",
   "clear": "Clear the map",

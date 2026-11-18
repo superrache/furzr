@@ -23,6 +23,8 @@ export const sv: Messages = {
   "play.explore": "Utforska",
   "play.game": "Spela",
   "mode.confirmSwitch": "Om du byter läge rensas den aktuella kartan. Fortsätta?",
+  "confirm.continue": "Fortsätt",
+  "confirm.cancel": "Avbryt",
 
   "input.label": "Artistnamn",
   "input.artist": "Skriv ett artistnamn här",
@@ -36,7 +38,7 @@ export const sv: Messages = {
   "about.howto":
     "Skriv en artist och klicka sedan på valfritt namn för att utöka kartan. Dra namnen, scrolla eller nyp för att zooma.",
   "about.growthHtml":
-    "<b>Orm</b> (Crazy Snake) behåller bara vägen du följt: outforskade namn försvinner vid varje steg. <b>Träd</b> (Huge Tree of Death) tar inte bort något och låter kartan växa i all oändlighet.",
+    "<b>Orm</b> behåller bara vägen du följt: outforskade namn försvinner vid varje steg. <b>Träd</b> tar inte bort något och låter kartan växa i all oändlighet.",
   "about.modesHtml":
     "Tre lägen: <b>Liknande</b> artister, <b>Influenser</b> (vem som inspirerade en artist och vem artisten inspirerade) och, när det finns, <b>Filmer</b> (rekommenderade filmer).",
   "about.gameHtml":
@@ -49,6 +51,7 @@ export const sv: Messages = {
   "legend.target": "mål (spel)",
 
   "share.tab": "Dela kartan",
+  "panel.close": "Stäng",
   "share.copy": "Kopiera länk",
   "share.native": "Dela…",
   "share.urlLabel": "Länk till den här kartan",
@@ -110,8 +113,8 @@ export const sv: Messages = {
   "growth.label": "Kartans tillväxt",
   "growth.snake": "Orm",
   "growth.tree": "Träd",
-  "growth.snakeTitle": "Crazy Snake: outforskade namn försvinner vid varje steg, bara din väg finns kvar",
-  "growth.treeTitle": "Huge Tree of Death: inget tas bort, kartan fortsätter att växa",
+  "growth.snakeTitle": "Outforskade namn försvinner vid varje steg, bara din väg finns kvar",
+  "growth.treeTitle": "Inget tas bort, kartan fortsätter att växa",
   "growth.toSnake": "Orm: outforskade namn försvinner vid nästa klick",
   "growth.toTree": "Träd: från och med nu tas inget bort från kartan",
   "clear": "Rensa kartan",

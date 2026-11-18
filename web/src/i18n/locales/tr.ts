@@ -23,6 +23,8 @@ export const tr: Messages = {
   "play.explore": "Keşfet",
   "play.game": "Oyna",
   "mode.confirmSwitch": "Mod değiştirmek mevcut haritayı siler. Devam edilsin mi?",
+  "confirm.continue": "Devam et",
+  "confirm.cancel": "İptal",
 
   "input.label": "Sanatçı adı",
   "input.artist": "Buraya bir sanatçı adı yazın",
@@ -36,7 +38,7 @@ export const tr: Messages = {
   "about.howto":
     "Bir sanatçı yazın, ardından haritayı genişletmek için herhangi bir ada tıklayın. Adları sürükleyin, yakınlaştırmak için kaydırın veya iki parmakla sıkıştırın.",
   "about.growthHtml":
-    "<b>Yılan</b> (Crazy Snake) yalnızca izlediğiniz yolu tutar: keşfedilmemiş adlar her adımda kaybolur. <b>Ağaç</b> (Huge Tree of Death) hiçbir şeyi silmez ve haritanın sonsuza dek büyümesine izin verir.",
+    "<b>Yılan</b> yalnızca izlediğiniz yolu tutar: keşfedilmemiş adlar her adımda kaybolur. <b>Ağaç</b> hiçbir şeyi silmez ve haritanın sonsuza dek büyümesine izin verir.",
   "about.modesHtml":
     "Üç mod: <b>Benzer</b> sanatçılar, <b>Etkiler</b> (bir sanatçıya kimin ilham verdiği ve onun kime ilham verdiği) ve mevcutsa <b>Filmler</b> (önerilen filmler).",
   "about.gameHtml":
@@ -49,6 +51,7 @@ export const tr: Messages = {
   "legend.target": "hedef (oyun)",
 
   "share.tab": "Bu haritayı paylaş",
+  "panel.close": "Kapat",
   "share.copy": "Bağlantıyı kopyala",
   "share.native": "Paylaş…",
   "share.urlLabel": "Bu haritanın bağlantısı",
@@ -110,8 +113,8 @@ export const tr: Messages = {
   "growth.label": "Harita büyümesi",
   "growth.snake": "Yılan",
   "growth.tree": "Ağaç",
-  "growth.snakeTitle": "Crazy Snake: keşfedilmemiş adlar her adımda kaybolur, yalnızca yolunuz kalır",
-  "growth.treeTitle": "Huge Tree of Death: hiçbir şey silinmez, harita büyümeye devam eder",
+  "growth.snakeTitle": "Keşfedilmemiş adlar her adımda kaybolur, yalnızca yolunuz kalır",
+  "growth.treeTitle": "Hiçbir şey silinmez, harita büyümeye devam eder",
   "growth.toSnake": "Yılan: keşfedilmemiş adlar bir sonraki tıklamada kaybolacak",
   "growth.toTree": "Ağaç: bundan sonra haritadan hiçbir şey silinmez",
   "clear": "Haritayı temizle",

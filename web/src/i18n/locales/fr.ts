@@ -23,6 +23,8 @@ export const fr: Messages = {
   "play.explore": "Explorer",
   "play.game": "Jouer",
   "mode.confirmSwitch": "Changer de mode efface la carte actuelle. Continuer ?",
+  "confirm.continue": "Continuer",
+  "confirm.cancel": "Annuler",
 
   "input.label": "Nom de l'artiste",
   "input.artist": "Saisissez un nom d'artiste",
@@ -36,7 +38,7 @@ export const fr: Messages = {
   "about.howto":
     "Saisissez un artiste, puis cliquez sur un nom pour agrandir la carte. Déplacez les noms, faites défiler ou pincez pour zoomer.",
   "about.growthHtml":
-    "<b>Serpent</b> (Crazy Snake) ne garde que le chemin parcouru : les noms non explorés disparaissent à chaque étape. <b>Arbre</b> (Huge Tree of Death) ne supprime rien et laisse la carte grandir sans fin.",
+    "<b>Serpent</b> ne garde que le chemin parcouru : les noms non explorés disparaissent à chaque étape. <b>Arbre</b> ne supprime rien et laisse la carte grandir sans fin.",
   "about.modesHtml":
     "Trois modes : artistes <b>Similaires</b>, <b>Influences</b> (qui a inspiré un artiste, et qui il a inspiré) et, si disponible, <b>Films</b> (films recommandés).",
   "about.gameHtml":
@@ -49,6 +51,7 @@ export const fr: Messages = {
   "legend.target": "cible (jeu)",
 
   "share.tab": "Partager la carte",
+  "panel.close": "Fermer",
   "share.copy": "Copier le lien",
   "share.native": "Partager…",
   "share.urlLabel": "Lien vers cette carte",
@@ -110,8 +113,8 @@ export const fr: Messages = {
   "growth.label": "Croissance de la carte",
   "growth.snake": "Serpent",
   "growth.tree": "Arbre",
-  "growth.snakeTitle": "Crazy Snake : les noms non explorés disparaissent à chaque étape, seul votre chemin reste",
-  "growth.treeTitle": "Huge Tree of Death : rien n'est supprimé, la carte grandit sans fin",
+  "growth.snakeTitle": "Les noms non explorés disparaissent à chaque étape, seul votre chemin reste",
+  "growth.treeTitle": "Rien n'est supprimé, la carte grandit sans fin",
   "growth.toSnake": "Serpent : les noms non explorés disparaîtront au prochain clic",
   "growth.toTree": "Arbre : désormais, plus rien n'est retiré de la carte",
   "clear": "Effacer la carte",

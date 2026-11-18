@@ -23,6 +23,8 @@ export const ja: Messages = {
   "play.explore": "探索",
   "play.game": "ゲーム",
   "mode.confirmSwitch": "モードを切り替えると現在のマップが消去されます。続けますか？",
+  "confirm.continue": "続ける",
+  "confirm.cancel": "キャンセル",
 
   "input.label": "アーティスト名",
   "input.artist": "アーティスト名を入力",
@@ -36,7 +38,7 @@ export const ja: Messages = {
   "about.howto":
     "アーティスト名を入力し、名前をクリックしてマップを広げます。名前はドラッグでき、スクロールやピンチでズームできます。",
   "about.growthHtml":
-    "<b>スネーク</b>（Crazy Snake）はたどった道だけを残し、未探索の名前はステップごとに消えます。<b>ツリー</b>（Huge Tree of Death）は何も消さず、マップは無限に広がります。",
+    "<b>スネーク</b>はたどった道だけを残し、未探索の名前はステップごとに消えます。<b>ツリー</b>は何も消さず、マップは無限に広がります。",
   "about.modesHtml":
     "モードは 3 つ：<b>似ている</b>アーティスト、<b>影響</b>（そのアーティストに影響を与えた人と、影響を受けた人）、利用できる場合は<b>映画</b>（おすすめの映画）。",
   "about.gameHtml":
@@ -49,6 +51,7 @@ export const ja: Messages = {
   "legend.target": "ゴール（ゲーム）",
 
   "share.tab": "このマップを共有",
+  "panel.close": "閉じる",
   "share.copy": "リンクをコピー",
   "share.native": "共有…",
   "share.urlLabel": "このマップへのリンク",
@@ -110,8 +113,8 @@ export const ja: Messages = {
   "growth.label": "マップの広がり方",
   "growth.snake": "スネーク",
   "growth.tree": "ツリー",
-  "growth.snakeTitle": "Crazy Snake：未探索の名前はステップごとに消え、たどった道だけが残ります",
-  "growth.treeTitle": "Huge Tree of Death：何も消えず、マップは広がり続けます",
+  "growth.snakeTitle": "未探索の名前はステップごとに消え、たどった道だけが残ります",
+  "growth.treeTitle": "何も消えず、マップは広がり続けます",
   "growth.toSnake": "スネーク：次のクリックで未探索の名前が消えます",
   "growth.toTree": "ツリー：これからはマップから何も消えません",
   "clear": "マップを消去",
