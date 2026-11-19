@@ -1,0 +1,127 @@
+import type { Messages } from "./en";
+
+export const fr: Messages = {
+  "meta.description":
+    "furzr propose une nouvelle façon d'explorer le monde de la musique : parcourez les liens entre artistes ou groupes et écoutez des extraits. Faites grandir votre culture musicale comme les branches d'un arbre.",
+  "map.label": "Carte de similarité entre artistes",
+
+  "lang.label": "Langue",
+
+  "form.add": "Ajouter",
+  "sound.mute": "Couper le son",
+  "sound.unmute": "Rétablir le son",
+  "sound.off": "Son coupé",
+  "sound.none": "Aucun extrait disponible",
+  "sound.unavailable": "Service d'extraits indisponible",
+
+  "mode.label": "Mode de la carte",
+  "mode.title": "Ce que la carte relie",
+  "mode.similar": "Similaires",
+  "mode.influences": "Influences",
+  "mode.movies": "Films",
+  "play.label": "Explorer ou jouer",
+  "play.explore": "Explorer",
+  "play.game": "Jouer",
+  "mode.confirmSwitch": "Changer de mode efface la carte actuelle. Continuer ?",
+  "confirm.continue": "Continuer",
+  "confirm.cancel": "Annuler",
+
+  "input.label": "Nom de l'artiste",
+  "input.artist": "Saisissez un nom d'artiste",
+  "input.movie": "Saisissez un titre de film",
+  "suggestions.label": "Suggestions",
+  "suggestions.fans": "{n} fans",
+
+  "about.title": "À propos",
+  "about.introHtml":
+    "<b>furzr</b> propose une façon originale d'explorer le monde de la musique : parcourez les liens entre artistes ou groupes et écoutez des extraits. Faites grandir votre culture musicale comme les branches d'un arbre et découvrez ce que vous écouterez bientôt.",
+  "about.howto":
+    "Saisissez un artiste, puis cliquez sur un nom pour agrandir la carte. Déplacez les noms, faites défiler ou pincez pour zoomer.",
+  "about.growthHtml":
+    "<b>Serpent</b> ne garde que le chemin parcouru : les noms non explorés disparaissent à chaque étape. <b>Arbre</b> ne supprime rien et laisse la carte grandir sans fin.",
+  "about.modesHtml":
+    "Trois modes : artistes <b>Similaires</b>, <b>Influences</b> (qui a inspiré un artiste, et qui il a inspiré) et, si disponible, <b>Films</b> (films recommandés).",
+  "about.gameHtml":
+    "<b>Jeu</b> : reliez deux artistes connus et éloignés l'un de l'autre par le serpent le plus court possible. Chaque défi a une difficulté (de facile à extrême) qui fixe un objectif de clics et les points en jeu : 1000 à 4000 dans l'objectif, puis 20 % de moins par clic supplémentaire.",
+  "about.creditsHtml":
+    "<b>furzr</b> utilise les données de {lastfm}, {wikidata} et {tmdb}, et les extraits audio de {deezer}. Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.",
+  "legend.input": "vos artistes",
+  "legend.exploded": "explorés",
+  "legend.similar": "similaires",
+  "legend.target": "cible (jeu)",
+
+  "share.tab": "Partager la carte",
+  "panel.close": "Fermer",
+  "share.copy": "Copier le lien",
+  "share.native": "Partager…",
+  "share.urlLabel": "Lien vers cette carte",
+  "share.copied": "Lien copié ! Toute personne qui l'ouvre verra cette carte.",
+  "share.copyManually": "Copiez ce lien pour partager votre carte.",
+  "share.invalid": "Ce lien de carte partagée n'est pas valide",
+  "share.unavailable": "Cette carte partagée utilise une source de données indisponible ici",
+
+  "map.description": "Cette carte montre comment relier {a} à {b}",
+  "map.empty.similar": "Agrandissez votre carte d'artistes",
+  "map.empty.influences": "Agrandissez votre carte des influences",
+  "map.empty.movies": "Agrandissez votre carte de films",
+  "map.empty.game": "Reliez les deux artistes",
+
+  "notFound.similar": "Aucun artiste connu sous ce nom, essayez-en un autre",
+  "notFound.influences": "Cet artiste est inconnu de Wikidata, essayez-en un autre",
+  "notFound.movies": "Aucun film connu sous ce titre, essayez-en un autre",
+  "noNeighbors.similar": "Cet artiste n'a pas d'artistes similaires",
+  "noNeighbors.influences": "Aucune influence connue pour cet artiste sur Wikidata",
+  "noNeighbors.movies": "Aucune recommandation pour ce film",
+  "notFound.game": "Aucun artiste connu sous ce nom, essayez-en un autre",
+  "noNeighbors.game": "Cet artiste n'a pas d'artistes similaires",
+
+  "game.new": "Nouveau défi",
+  "game.loading": "Recherche de deux artistes éloignés…",
+  "game.goal": "Reliez {a} à {b}",
+  "game.start": "Reliez {a} à {b} en cliquant sur les artistes similaires. Moins il y a de clics, plus le score est élevé !",
+  "game.moves": "Clics : {n}",
+  "game.score": "Score : {score}",
+  "game.difficulty": "Difficulté : {level}",
+  "difficulty.1": "Facile",
+  "difficulty.2": "Moyen",
+  "difficulty.3": "Difficile",
+  "difficulty.4": "Extrême",
+  "game.record": "Nouveau record personnel !",
+  "game.result": "Résultat",
+  "game.failed": "Impossible de trouver un défi, réessayez",
+  "game.shareGoal": "Défi furzr : reliez {a} à {b} en un minimum de clics",
+  "game.shareWon": "J'ai relié {a} à {b} sur furzr. Clics : {n}, score : {score}. Ferez-vous mieux ?",
+
+  "victory.title": "Bravo !",
+  "victory.perfect": "Parfait !",
+  "victory.subtitle": "Vous avez relié {a} à {b}",
+  "victory.path": "Votre chemin",
+  "victory.score": "Score",
+  "victory.clicks": "Clics",
+  "victory.difficulty": "Difficulté",
+  "victory.par": "objectif : {n} clics",
+  "victory.best": "Record",
+  "victory.share": "Partager",
+  "victory.viewMap": "Voir la carte",
+  "victory.copied": "Lien copié ! Envoyez-le à un ami pour le défier.",
+  "tip.loading": "Chargement…",
+
+  "help.clickArtist": "Cliquez sur un artiste pour agrandir la carte",
+  "help.clickMovie": "Cliquez sur un film pour agrandir la carte",
+  "help.share": "Amusez-vous bien et partagez votre carte !",
+
+  "growth.label": "Croissance de la carte",
+  "growth.snake": "Serpent",
+  "growth.tree": "Arbre",
+  "growth.snakeTitle": "Les noms non explorés disparaissent à chaque étape, seul votre chemin reste",
+  "growth.treeTitle": "Rien n'est supprimé, la carte grandit sans fin",
+  "growth.toSnake": "Serpent : les noms non explorés disparaîtront au prochain clic",
+  "growth.toTree": "Arbre : désormais, plus rien n'est retiré de la carte",
+  "clear": "Effacer la carte",
+
+  "overview.about": "À propos : {name}",
+  "overview.readMore": "En savoir plus sur {source}",
+
+  "error.service": "Le service est momentanément indisponible, réessayez dans un instant",
+  "error.generic": "Une erreur s'est produite, veuillez réessayer",
+};

@@ -1,0 +1,1358 @@
+:root {
+  /* thème sombre : contrôles natifs (listes, barres de défilement) assortis */
+  color-scheme: dark;
+
+  --text: #d5dbe1;
+  --text-dim: #9aa4ae;
+  --accent: #00b3ff;
+  /* fond des boutons actifs (texte blanc dessus) */
+  --accent-dark: #2572b8;
+  /* bleu lisible sur fond sombre : liens, tags, chiffres */
+  --accent-text: #6ec1ff;
+  --panel: rgba(44, 50, 58, 0.88);
+  --surface: #262c33;
+  --input-bg: rgba(20, 24, 29, 0.85);
+  --border: rgba(255, 255, 255, 0.16);
+  --error: #7a2e2e;
+  --toast: rgba(74, 66, 22, 0.96);
+  --shadow: rgba(0, 0, 0, 0.6);
+
+  /* graphe (lus par MapView) */
+  --map-bg: #15191e;
+  --map-link: rgba(255, 255, 255, 0.28);
+  --map-halo: rgba(21, 25, 30, 0.9);
+  --map-ring: rgba(255, 255, 255, 0.12);
+  --map-ring-hover: rgba(0, 179, 255, 0.8);
+  --map-font: Tahoma, Verdana, "Segoe UI", sans-serif;
+  --node-input: #e04dff;
+  --node-exploded: #4fa3ea;
+  --node-similar: #ff7a3d;
+  --node-target: #3cc83a;
+
+  --transition: 0.6s ease;
+  /* ouverture des panneaux (volets, fiche « À propos ») : plus vive que le reste */
+  --panel-transition: 0.25s ease-out;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: Tahoma, Verdana, "Segoe UI", sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--map-bg);
+}
+
+/* body contient tous les éléments positionnés et coupe ce qui dépasse : sans ça, les panneaux escamotés
+   hors écran (à droite) élargissent la page, et Chrome mobile la dézoome pour tout montrer (707 px au
+   lieu de 390) */
+body {
+  position: relative;
+}
+
+a {
+  color: var(--accent-text);
+}
+
+a:hover {
+  color: white;
+  background-color: var(--accent);
+}
+
+h1,
+h2 {
+  margin: 0;
+  color: var(--accent);
+  text-shadow: 1px 1px 2px var(--accent-dark);
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.3em;
+}
+
+h3 {
+  font-size: 1em;
+  margin: 0 0 8px;
+}
+
+p {
+  margin: 0 0 8px;
+}
+
+input {
+  font: inherit;
+  font-weight: bold;
+  color: var(--text);
+  width: 100%;
+  padding: 5px 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--input-bg);
+}
+
+input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  background: var(--surface);
+}
+
+.button {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 0;
+  border-radius: 3px;
+  padding: 5px 12px;
+  cursor: pointer;
+  min-height: 30px;
+}
+
+.button:hover:not(:disabled),
+.button:focus-visible {
+  background: var(--accent);
+  color: white;
+  outline: none;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.floating {
+  position: absolute;
+  z-index: 15;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background-color var(--transition);
+}
+
+.floating:hover,
+.floating:focus-within {
+  background-color: var(--panel);
+}
+
+/* ---------- carte ---------- */
+
+#map {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+#veil {
+  position: absolute;
+  inset: 0;
+  z-index: 18;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+
+.start #veil {
+  opacity: 1;
+}
+
+/* ---------- titre et saisie : centrés au démarrage, puis rangés en haut ---------- */
+
+#title {
+  position: absolute;
+  z-index: 21;
+  left: 12px;
+  top: 8px;
+  font-size: 1em;
+  transition: all var(--transition);
+  pointer-events: none;
+}
+
+.start #title {
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -110%);
+  font-size: 2em;
+}
+
+#artist-form {
+  z-index: 22;
+  right: 205px;
+  top: 5px;
+  width: 420px;
+  font-size: 1em;
+  transition: all var(--transition);
+}
+
+.start #artist-form {
+  right: 50%;
+  top: 30%;
+  transform: translateX(50%);
+  width: min(600px, calc(100vw - 32px));
+  font-size: 1.6em;
+}
+
+#artist-form .button {
+  float: right;
+  margin-left: 5px;
+}
+
+/* Explorer | Jouer : interrupteur sur sa propre ligne, au-dessus du champ */
+#play-switch {
+  display: flex;
+  margin-bottom: 5px;
+  font-size: 0.85em;
+}
+
+.start #play-switch {
+  justify-content: center;
+  font-size: 0.7em;
+}
+
+#artist-form #play-switch .button {
+  float: none;
+  margin: 0;
+  height: auto;
+  padding: 3px 14px;
+}
+
+/* sur la carte (écran large) : à gauche, sur la ligne des boutons ; le formulaire s'élargit d'autant */
+@media (min-width: 721px) {
+  body:not(.start) #artist-form {
+    width: min(540px, calc(100vw - 230px));
+  }
+
+  body:not(.start) #play-switch {
+    float: left;
+    margin: 0 5px 0 0;
+    font-size: inherit;
+  }
+
+  body:not(.start) #artist-form #play-switch .button {
+    height: calc(1.3em + 12px);
+    padding: 0 10px;
+  }
+}
+
+/* sélecteur de mode, rangé à droite avec les boutons */
+#mode {
+  font: inherit;
+  padding: 0 6px;
+}
+
+/* champ, sélecteur et boutons à la même hauteur, quels que soient le navigateur et la taille de police
+   (accueil en 1.6em) : sans hauteur explicite, Firefox dimensionne le <select> différemment */
+#artist-form input,
+#artist-form select,
+#artist-form .button {
+  height: calc(1.3em + 12px);
+}
+
+#artist-form span {
+  display: block;
+  overflow: hidden;
+}
+
+#artist-form span[hidden] {
+  display: none;
+}
+
+/* mode jeu : défi « A → B · score » sur sa propre ligne, sous les boutons (passe à la ligne au besoin) */
+#artist-form #game-goal {
+  clear: both;
+  margin-top: 5px;
+}
+
+#game-goal {
+  box-sizing: border-box;
+  min-height: calc(1.3em + 12px);
+  line-height: 1.3em;
+  padding: 6px 8px;
+  overflow-wrap: anywhere;
+  background: var(--surface);
+  border-radius: 3px;
+}
+
+/* noms du défi : infobulle au survol, au focus ou à l'appui */
+#game-goal .from,
+#game-goal .to {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  border-radius: 2px;
+}
+
+#game-goal .from:focus-visible,
+#game-goal .to:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+#game-goal .from {
+  color: var(--node-input);
+}
+
+#game-goal .to {
+  color: var(--node-target);
+}
+
+#artist-form #game-goal .status span {
+  display: inline;
+  white-space: nowrap;
+}
+
+#artist-form #game-goal .status {
+  display: inline;
+  opacity: 0.8;
+}
+
+/* en jeu, le formulaire est plus haut (ligne du défi) : messages en dessous */
+body.game:not(.start) #toasts {
+  top: 85px;
+}
+
+/* auto-complétion */
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 5px;
+  right: 5px;
+  margin: 2px 0 0;
+  padding: 3px;
+  list-style: none;
+  max-height: min(60vh, 360px);
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 3px;
+  box-shadow: 0 3px 8px var(--shadow);
+  text-align: left;
+}
+
+.suggestions li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.suggestions li:hover,
+.suggestions li[aria-selected="true"] {
+  background: var(--accent);
+  color: white;
+}
+
+.suggestions img {
+  flex: none;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--panel);
+}
+
+.suggestions .name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.suggestions .detail {
+  flex: none;
+  font-size: 0.75em;
+  opacity: 0.7;
+}
+
+body:not(.start) #title {
+  opacity: 0;
+}
+
+.start #tools,
+.start .drawer {
+  display: none;
+}
+
+/* ---------- langue : toujours dans le coin haut droit, accueil comme carte ---------- */
+
+/* code de langue du sélecteur compact : seulement sur petit écran */
+#lang-code {
+  display: none;
+}
+
+#lang-box {
+  position: absolute;
+  z-index: 22;
+  top: 10px;
+  right: 12px;
+}
+
+#lang {
+  display: block;
+  padding: 0 4px;
+  height: 30px;
+  font-size: 0.9em;
+  background: var(--panel);
+}
+
+/* ---------- panneaux escamotables ---------- */
+
+.drawer {
+  position: absolute;
+  z-index: 14;
+  display: flex;
+  padding: 6px;
+  border-radius: 5px;
+  transition:
+    transform var(--panel-transition),
+    background-color var(--panel-transition);
+}
+
+.drawer.open {
+  background-color: var(--panel);
+}
+
+.drawer-tab {
+  background: none;
+  border: 0;
+  padding: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.drawer-content {
+  width: 380px;
+}
+
+/* icône de l'onglet et bouton × : petit écran seulement (fenêtres flottantes) */
+.tab-icon,
+.drawer-close {
+  display: none;
+}
+
+.box {
+  border: 2px solid var(--border);
+  border-radius: 3px;
+  padding: 8px;
+  text-align: justify;
+}
+
+.drawer-left {
+  top: 60px;
+  left: 0;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  transform: translateX(calc(-100% + 44px));
+}
+
+.drawer-left .drawer-tab,
+.drawer-right .drawer-tab {
+  writing-mode: vertical-rl;
+}
+
+.drawer-left .drawer-tab {
+  transform: rotate(180deg);
+}
+
+.drawer-right {
+  top: 125px;
+  right: 0;
+  align-items: flex-start;
+  transform: translateX(calc(100% - 44px));
+}
+
+.drawer-bottom {
+  right: 50px;
+  /* au-dessus du lecteur d'extraits (centré en bas), sauf sur grand écran où ils tiennent côte à côte */
+  bottom: var(--player-space, 0px);
+  flex-direction: column;
+  max-width: 420px;
+}
+
+.drawer-bottom .drawer-tab {
+  text-align: left;
+}
+
+/* replié, seul le nom dépasse : le contenu se déplie vers le haut (le panneau est ancré en bas) */
+.drawer-bottom .drawer-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--panel-transition),
+    visibility var(--panel-transition);
+}
+
+.drawer-bottom .drawer-content > * {
+  min-height: 0; /* la fiche (overflow: auto) peut descendre à 0 */
+}
+
+.drawer-bottom.open .drawer-content,
+.drawer-bottom.hovered .drawer-content {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+
+@media (min-width: 1500px) {
+  .drawer-bottom {
+    bottom: 0;
+  }
+}
+
+/* ---------- lecteur d'extraits ---------- */
+
+#player {
+  position: absolute;
+  z-index: 15;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(560px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 3px 14px 3px 4px;
+  background: var(--panel);
+  border-radius: 20px;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.start #player {
+  display: none;
+}
+
+.drawer.open {
+  transform: none;
+}
+
+/* ouvert au survol de l'onglet seulement (classe posée par setupDrawers), pas du reste du panneau */
+.drawer.hovered {
+  transform: none;
+  background-color: var(--panel);
+}
+
+.legend .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 3px 0 8px;
+}
+
+.legend .dot:first-child {
+  margin-left: 0;
+}
+
+.dot.input {
+  background: var(--node-input);
+}
+
+.dot.exploded {
+  background: var(--node-exploded);
+}
+
+.dot.target {
+  background: var(--node-target);
+}
+
+.dot.similar {
+  background: var(--node-similar);
+}
+
+.copyright {
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.share-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+#share-url {
+  border: 2px solid var(--accent);
+  color: var(--accent-text);
+}
+
+.feedback {
+  margin-top: 6px;
+  font-size: 0.9em;
+}
+
+/* ---------- fiche artiste ---------- */
+
+#sound-title {
+  display: flex;
+  align-items: center;
+  min-height: 1.7em;
+  text-align: left;
+}
+
+/* sur deux lignes, le texte reste aligné à droite de la note */
+.sound-text {
+  min-width: 0;
+}
+
+/* note de l'extrait : bouton couper / rétablir le son */
+.sound-note {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7em;
+  height: 1.7em;
+  flex-shrink: 0;
+  margin-right: 6px;
+  padding: 0;
+  vertical-align: middle;
+  font: inherit;
+  font-size: 1.1em;
+  line-height: 1;
+  color: var(--accent-text);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.sound-note:focus-visible {
+  color: white;
+  background: var(--accent);
+  outline: none;
+}
+
+/* survol réservé aux souris : sur écran tactile, il resterait affiché après le toucher */
+@media (hover: hover) {
+  .sound-note:hover {
+    color: white;
+    background: var(--accent);
+  }
+}
+
+.sound-note.muted {
+  color: var(--text-dim);
+}
+
+/* pendant la lecture, la note danse en mesure */
+.sound-note.playing span {
+  display: inline-block;
+  animation: note-dance 1.2s ease-in-out infinite;
+}
+
+@keyframes note-dance {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  25% {
+    transform: translateY(-3px) rotate(6deg) scale(1.1);
+  }
+  50% {
+    transform: translateY(0) rotate(8deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(-4deg) scale(1.05);
+  }
+}
+
+.overview-detail {
+  max-height: 300px;
+  overflow: auto;
+  text-align: justify;
+}
+
+#overview-link {
+  float: left;
+  margin: 0 8px 4px 0;
+}
+
+#overview-link:hover {
+  background: none;
+}
+
+#overview-image {
+  height: auto; /* affiches de films en 2:3, photos carrées */
+}
+
+#overview-tags {
+  color: var(--accent-text);
+}
+
+#tools {
+  left: 5px;
+  bottom: 5px;
+  transition: bottom var(--transition);
+  display: flex;
+  gap: 8px;
+}
+
+/* boutons Snake / Tree accolés */
+.segmented {
+  display: inline-flex;
+}
+
+.segmented .button {
+  border-radius: 0;
+}
+
+.segmented .button:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.segmented .button:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.segmented .button[aria-pressed="true"] {
+  background: var(--accent-dark);
+  color: white;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--accent);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- messages ---------- */
+
+#toasts {
+  position: absolute;
+  z-index: 21; /* sous le formulaire et sa liste de propositions */
+  top: 55px;
+  right: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 240px;
+  pointer-events: none;
+}
+
+.toast {
+  padding: 6px 8px;
+  border-radius: 3px;
+  background: var(--toast);
+  box-shadow: 2px 2px 3px var(--shadow);
+  text-align: left;
+  animation: fade-in 0.3s ease;
+}
+
+.toast.error {
+  background: var(--error);
+}
+
+.toast.leaving {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- petits écrans ---------- */
+
+/* écran moyen : les outils (en bas à gauche) toucheraient le lecteur centré, ils passent au-dessus */
+@media (min-width: 721px) and (max-width: 1199px) {
+  #tools {
+    bottom: max(5px, var(--player-space, 0px));
+  }
+}
+
+@media (max-width: 720px) {
+  #title {
+    display: none;
+  }
+
+  .start #title {
+    display: block;
+  }
+
+  #artist-form {
+    left: 8px;
+    right: 8px;
+    width: auto;
+    background-color: var(--panel);
+  }
+
+  .start #artist-form {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    font-size: 1.2em;
+  }
+
+  /* « furzr » et « Partager » : plus de volets qui glissent, mais deux boutons rangés sous le sélecteur
+     de langue, qui ouvrent chacun une fenêtre flottante centrée (setupDrawers gère la fermeture) */
+  .drawer-left,
+  .drawer-right,
+  .drawer-left.open,
+  .drawer-right.open {
+    position: static;
+    padding: 0;
+    transform: none;
+    background: none;
+    transition: none;
+  }
+
+  .drawer-left .drawer-tab,
+  .drawer-right .drawer-tab {
+    position: absolute;
+    z-index: 22;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 30px;
+    padding: 0;
+    writing-mode: horizontal-tb;
+    transform: none;
+    color: var(--accent-text);
+    background: var(--panel);
+    border-radius: 5px;
+  }
+
+  .drawer-left .drawer-tab {
+    top: 46px;
+  }
+
+  .drawer-left .drawer-tab h1 {
+    margin: 0;
+    font-size: 1.05em;
+    text-shadow: none;
+  }
+
+  .drawer-right .drawer-tab {
+    top: 82px;
+  }
+
+  .drawer-right .tab-icon {
+    display: block;
+  }
+
+  /* titre « Partager la carte » : lu par les lecteurs d'écran, pas affiché */
+  .drawer-right .drawer-tab h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .drawer-left .drawer-content,
+  .drawer-right .drawer-content {
+    display: none;
+  }
+
+  /* voile : pseudo-élément du panneau (un toucher dessus le ferme) */
+  .drawer-left.open::before,
+  .drawer-right.open::before {
+    content: "";
+    position: fixed;
+    z-index: 40;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .drawer-left.open .drawer-content,
+  .drawer-right.open .drawer-content {
+    position: fixed;
+    z-index: 41;
+    top: 50%;
+    left: 16px;
+    right: 16px;
+    display: block;
+    width: auto;
+    max-height: calc(100% - 32px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 10px;
+    background: var(--surface);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px var(--shadow);
+    transform: translateY(-50%);
+  }
+
+  .drawer-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    font: inherit;
+    font-size: 1.5em;
+    line-height: 1;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  /* dans la fenêtre : pas de second cadre, texte aligné à gauche (justifié, il laissait des trous) */
+  .drawer-left .box,
+  .drawer-right .box {
+    border: 0;
+    padding: 4px;
+    text-align: left;
+  }
+
+  /* les boutons se détachent du fond de la fenêtre (même couleur qu'eux sinon) */
+  .drawer-right .drawer-content .button {
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+  }
+
+  /* le titre du contenu ne passe pas sous le bouton × */
+  .drawer-left .box h3,
+  .drawer-right .box h3 {
+    margin-top: 4px;
+    padding-right: 40px;
+  }
+
+  .drawer-bottom {
+    left: 8px;
+    right: 8px;
+    max-width: none;
+  }
+
+  #player {
+    left: 8px;
+    right: 8px;
+    transform: none;
+    width: auto;
+    max-width: none;
+  }
+
+  .drawer-bottom .drawer-content {
+    width: 100%;
+  }
+
+  /* fiche de l'artiste : l'onglet a l'air d'un bouton (pas de survol sur mobile pour le deviner),
+     avec un chevron qui indique le sens d'ouverture */
+  .drawer-bottom .drawer-tab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 7px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+
+  .drawer-bottom .drawer-tab h2 {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 1.1em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-shadow: none;
+  }
+
+  .drawer-bottom .drawer-tab::after {
+    content: "";
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-top: 4px;
+    border-top: 2px solid var(--accent-text);
+    border-right: 2px solid var(--accent-text);
+    transform: rotate(-45deg); /* vers le haut : la fiche se déplie vers le haut */
+    transition: transform var(--panel-transition);
+  }
+
+  .drawer-bottom.open .drawer-tab::after {
+    margin-top: -4px;
+    transform: rotate(135deg);
+  }
+
+  .drawer-bottom .drawer-tab:active {
+    background: var(--input-bg);
+  }
+
+  .drawer-bottom .overview-detail {
+    margin-top: 8px;
+  }
+
+  #tools {
+    bottom: auto;
+    /* sous le formulaire (interrupteur, saisie ou bandeau du défi), dont la hauteur varie */
+    top: calc(5px + var(--form-height, 87px) + 4px);
+    left: 3px;
+  }
+
+  /* sur mobile, le formulaire de la carte s'arrête avant le sélecteur de langue (largeur fixe) */
+  /* sélecteur compact : le code (« FR ») est affiché par-dessus le <select>, dont le texte est masqué ;
+     la liste native garde les noms complets */
+  body:not(.start) #artist-form {
+    right: 68px;
+  }
+
+  #lang-box {
+    right: 8px;
+  }
+
+  #lang {
+    width: 54px;
+    color: transparent;
+  }
+
+  #lang option {
+    color: var(--text);
+  }
+
+  #lang-code {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: flex;
+    align-items: center;
+    padding-left: 9px;
+    font-size: 0.9em;
+    pointer-events: none;
+  }
+
+  #toasts,
+  body.game:not(.start) #toasts {
+    top: calc(5px + var(--form-height, 87px) + 50px);
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ---------- confirmation (confirmDialog) ---------- */
+
+#confirm {
+  width: min(360px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px var(--shadow);
+}
+
+#confirm[open] {
+  animation: confirm-pop 0.2s ease-out;
+}
+
+@keyframes confirm-pop {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+}
+
+#confirm::backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.confirm-card {
+  padding: 18px 18px 14px;
+}
+
+#confirm-message {
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ---------- victoire du mode jeu ---------- */
+
+/* le <dialog> couvre tout l'écran (confettis), la carte de résultat est centrée */
+#victory {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+#victory[open] {
+  display: flex;
+}
+
+#victory::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* sur la carte pendant la célébration, puis dans la fenêtre (au-dessus de son voile) */
+#confetti {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* bandeau du défi gagné : rouvre la fenêtre de victoire */
+.result-button {
+  padding: 1px 8px;
+  font: inherit;
+  font-size: 0.9em;
+  color: white;
+  background: var(--accent-dark);
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.victory-card {
+  position: relative;
+  width: min(440px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px 20px 18px;
+  text-align: center;
+  color: var(--text);
+  background: var(--surface);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px var(--shadow);
+  animation: victory-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+@keyframes victory-pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+.victory-trophy {
+  display: block;
+  margin: 0 auto;
+  animation: victory-bounce 1.2s ease-in-out 0.4s 2;
+}
+
+@keyframes victory-bounce {
+  50% {
+    transform: translateY(-10px) rotate(-8deg);
+  }
+}
+
+#victory-title {
+  margin: 8px 0 4px;
+  font-size: 1.8em;
+}
+
+#victory-subtitle {
+  margin: 0 0 14px;
+}
+
+/* chemin : étiquettes reliées par des flèches, aux couleurs de la carte */
+#victory-path {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  font-weight: bold;
+}
+
+#victory-path li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#victory-path .chip {
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: var(--map-bg); /* couleurs des nœuds claires sur fond sombre : texte foncé */
+  background: var(--node-exploded);
+}
+
+#victory-path li:first-child .chip {
+  background: var(--node-input);
+}
+
+#victory-path li:last-child .chip {
+  background: var(--node-target);
+}
+
+.victory-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.victory-stats div {
+  flex: 1 1 70px;
+  padding: 8px 4px;
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.victory-stats dt {
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+.victory-stats dd {
+  margin: 2px 0 0;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* difficulté : un mot (« Extrême ») plutôt qu'un nombre, et le par en dessous */
+.victory-stats #victory-difficulty {
+  font-size: 1.05em;
+  line-height: 1.6em;
+}
+
+.victory-stats #victory-par {
+  font-size: 0.75em;
+  font-weight: normal;
+  color: var(--text);
+  opacity: 0.8;
+}
+
+#victory-record {
+  margin: 0 0 12px;
+  font-weight: bold;
+  color: var(--node-target);
+}
+
+.victory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.victory-actions .button,
+.confirm-actions .button {
+  background: var(--panel);
+}
+
+.victory-actions .button.primary,
+.confirm-actions .button.primary {
+  color: white;
+  background: var(--accent-dark);
+}
+
+.victory-actions .button:hover:not(:disabled),
+.victory-actions .button:focus-visible,
+.confirm-actions .button:hover:not(:disabled),
+.confirm-actions .button:focus-visible {
+  color: white;
+  background: var(--accent);
+}
+
+/* ---------- infobulle d'artiste (mode jeu) ---------- */
+
+#artist-tip {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  gap: 10px;
+  width: min(360px, calc(100vw - 16px));
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 0.9em;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border-radius: 6px;
+  box-shadow: 0 6px 24px var(--shadow);
+  pointer-events: none;
+}
+
+#artist-tip[hidden] {
+  display: none;
+}
+
+#artist-tip .tip-image {
+  flex: none;
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+#artist-tip .tip-text {
+  min-width: 0;
+}
+
+#artist-tip strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 1.1em;
+  color: var(--accent-text);
+}
+
+#artist-tip .tip-tags {
+  margin: 0 0 4px;
+  color: var(--accent-text);
+}
+
+#artist-tip .tip-bio {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
+}

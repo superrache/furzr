@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#15191e" />
+    <title>furzr</title>
+    <meta
+      name="description"
+      content="Furzr offers a new way to explore the world of music, browsing relationships between artists or bands and listening samples. Expand your musical knowledge like the leaves of a tree."
+    />
+    <meta property="og:title" content="furzr" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="furzr-logo-256.png" />
+    <link rel="icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="apple-touch-icon-precomposed.png" />
+  </head>
+  <body class="start">
+    <div id="map" aria-label="Artist similarity map" data-i18n-attr="aria-label:map.label"></div>
+    <div id="veil"></div>
+
+    <header id="title"><h1>furzr</h1></header>
+
+    <form id="artist-form" class="floating" autocomplete="off">
+      <!-- explorer librement ou jouer : deux usages distincts, au-dessus du champ -->
+      <div id="play-switch" class="segmented" role="group" aria-label="Explore or play" data-i18n-attr="aria-label:play.label">
+        <button type="button" class="button" data-play="explore" aria-pressed="true" data-i18n="play.explore">Explore</button>
+        <button type="button" class="button" data-play="game" aria-pressed="false" data-i18n="play.game">Play</button>
+      </div>
+      <button id="artist-submit" type="submit" class="button" data-i18n="form.add">Add</button>
+      <select id="mode" class="button" aria-label="Map mode" title="What the map links together" data-i18n-attr="aria-label:mode.label;title:mode.title">
+        <option value="similar" data-i18n="mode.similar">Similar</option>
+        <option value="influences" data-i18n="mode.influences">Influences</option>
+        <option value="movies" data-i18n="mode.movies">Movies</option>
+      </select>
+      <span id="game-goal" role="status" hidden></span>
+      <span id="input-box"><input id="artist-input" type="search" placeholder="Give a music artist name here" aria-label="Artist name" data-i18n-attr="aria-label:input.label" /></span>
+    </form>
+
+    <span id="lang-box">
+      <select id="lang" class="button" aria-label="Language" data-i18n-attr="aria-label:lang.label;title:lang.label"></select>
+      <span id="lang-code" aria-hidden="true"></span>
+    </span>
+
+    <aside id="about" class="drawer drawer-left">
+      <button class="drawer-tab" type="button" aria-expanded="false"><h1>furzr</h1></button>
+      <div class="drawer-content">
+        <button class="drawer-close" type="button" aria-label="Close" title="Close" data-i18n-attr="aria-label:panel.close;title:panel.close">×</button>
+        <section class="box">
+          <h3 data-i18n="about.title">About this app</h3>
+          <p data-i18n-html="about.introHtml">
+            <b>furzr</b> offers an original way to explore the world of music, browsing relationships between artists or bands
+            and listening samples. This app lets you expand your musical knowledge like the leaves of a tree and find out what
+            you will be listening soon.
+          </p>
+          <p data-i18n="about.howto">
+            Type an artist, then click on any name to expand the map. Drag names around, scroll or pinch to zoom.
+          </p>
+          <p data-i18n-html="about.growthHtml">
+            <b>Snake</b> keeps only the path you followed: unexplored names vanish at each step.
+            <b>Tree</b> removes nothing and lets the map grow forever.
+          </p>
+          <p data-i18n-html="about.modesHtml">
+            Three modes: <b>Similar</b> artists, <b>Influences</b> (who inspired an artist, and whom they inspired) and,
+            when available, <b>Movies</b> (recommended films).
+          </p>
+          <p data-i18n-html="about.gameHtml">
+            <b>Game</b>: link two well-known artists, far apart from each other, with the shortest possible snake.
+            The best is 2 clicks for 1000 points; every extra click halves the score.
+          </p>
+          <p data-i18n-html="about.creditsHtml">
+            <b>furzr</b> uses data from <a href="https://www.last.fm" target="_blank" rel="noopener">Last.fm</a>,
+            <a href="https://www.wikidata.org" target="_blank" rel="noopener">Wikidata</a> and
+            <a href="https://www.themoviedb.org" target="_blank" rel="noopener">TMDB</a>, and audio previews from
+            <a href="https://www.deezer.com" target="_blank" rel="noopener">Deezer</a>. This product uses the TMDB API but
+            is not endorsed or certified by TMDB.
+          </p>
+          <p class="legend">
+            <span class="dot input"></span> <span data-i18n="legend.input">your artists</span>
+            <span class="dot exploded"></span> <span data-i18n="legend.exploded">explored</span>
+            <span class="dot similar"></span> <span data-i18n="legend.similar">similar</span>
+            <span class="dot target"></span> <span data-i18n="legend.target">target (game)</span>
+          </p>
+          <p class="copyright">© 2013-2026 furzr</p>
+        </section>
+      </div>
+    </aside>
+
+    <aside id="share" class="drawer drawer-right">
+      <button class="drawer-tab" type="button" aria-expanded="false">
+        <!-- sur mobile, l'onglet est un bouton icône (le titre reste lu par les lecteurs d'écran) -->
+        <svg class="tab-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="18" cy="5" r="3" fill="currentColor" />
+          <circle cx="6" cy="12" r="3" fill="currentColor" />
+          <circle cx="18" cy="19" r="3" fill="currentColor" />
+          <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" stroke="currentColor" stroke-width="2" fill="none" />
+        </svg>
+        <h2 data-i18n="share.tab">Share this map</h2>
+      </button>
+      <div class="drawer-content">
+        <button class="drawer-close" type="button" aria-label="Close" title="Close" data-i18n-attr="aria-label:panel.close;title:panel.close">×</button>
+        <section class="box">
+          <h3 id="map-description">Expand your artist map</h3>
+          <div class="share-actions">
+            <button id="share-copy" type="button" class="button" disabled data-i18n="share.copy">Copy link</button>
+            <button id="share-native" type="button" class="button" hidden disabled data-i18n="share.native">Share…</button>
+          </div>
+          <input id="share-url" type="text" readonly hidden aria-label="Link to this map" data-i18n-attr="aria-label:share.urlLabel" />
+          <p id="share-feedback" class="feedback" hidden></p>
+        </section>
+      </div>
+    </aside>
+
+    <aside id="overview" class="drawer drawer-bottom" hidden>
+      <button class="drawer-tab" type="button" aria-expanded="false">
+        <h2 id="overview-name"></h2>
+      </button>
+      <div class="drawer-content">
+        <div class="overview-detail">
+          <a id="overview-link" href="https://www.last.fm" target="_blank" rel="noopener">
+            <img id="overview-image" alt="" width="126" height="126" hidden />
+          </a>
+          <p id="overview-tags"></p>
+          <p id="overview-bio"></p>
+        </div>
+      </div>
+    </aside>
+
+    <div id="tools" class="floating">
+      <span class="segmented" role="group" aria-label="Map growth" data-i18n-attr="aria-label:growth.label">
+        <button type="button" class="button" data-growth="snake" aria-pressed="true"
+          title="Unexplored names vanish at each step, only your path remains"
+          data-i18n="growth.snake" data-i18n-attr="title:growth.snakeTitle">Snake</button>
+        <button type="button" class="button" data-growth="tree" aria-pressed="false"
+          title="Nothing is removed, the map keeps growing"
+          data-i18n="growth.tree" data-i18n-attr="title:growth.treeTitle">Tree</button>
+      </span>
+      <button id="clear" type="button" class="button" data-i18n="clear">Clear the map</button>
+    </div>
+
+    <!-- lecteur d'extraits : hors du panneau de la fiche (le pointer pour couper le son ne l'ouvre
+         plus), toujours visible en bas, centré -->
+    <div id="player" hidden>
+      <div id="sound-title" aria-live="polite"></div>
+    </div>
+
+    <div id="toasts" aria-live="polite"></div>
+    <div id="artist-tip" role="tooltip" hidden></div>
+
+    <!-- victoire du mode jeu : par-dessus toute l'application (top layer de <dialog>) -->
+    <!-- confirmation (remplace confirm() du navigateur) : petit panneau centré, voir confirmDialog() -->
+    <dialog id="confirm" aria-labelledby="confirm-message">
+      <form method="dialog" class="confirm-card">
+        <p id="confirm-message"></p>
+        <div class="confirm-actions">
+          <button id="confirm-cancel" type="submit" value="cancel" class="button" data-i18n="confirm.cancel">Cancel</button>
+          <button id="confirm-ok" type="submit" value="ok" class="button primary" data-i18n="confirm.continue">Continue</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- confettis : d'abord sur la carte, puis déplacés dans la fenêtre de victoire à son ouverture -->
+    <canvas id="confetti" aria-hidden="true"></canvas>
+    <dialog id="victory" aria-labelledby="victory-title">
+      <div class="victory-card">
+        <svg class="victory-trophy" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+          <path d="M18 8h28v14c0 9-6 16-14 16s-14-7-14-16z" fill="#f5b400" />
+          <path d="M18 12H8v4c0 7 5 12 12 12M46 12h10v4c0 7-5 12-12 12" fill="none" stroke="#f5b400" stroke-width="4" />
+          <path d="M28 38h8v10h-8z" fill="#e0a000" />
+          <path d="M20 48h24v8H20z" fill="#c98f00" />
+          <path d="M26 14l2 6h6l-5 4 2 6-5-4-5 4 2-6-5-4h6z" fill="#fff6c8" transform="translate(6 0)" />
+        </svg>
+        <h2 id="victory-title"></h2>
+        <p id="victory-subtitle"></p>
+        <ol id="victory-path" aria-label="Your path" data-i18n-attr="aria-label:victory.path"></ol>
+        <dl class="victory-stats">
+          <div><dt data-i18n="victory.score">Score</dt><dd id="victory-score"></dd></div>
+          <div><dt data-i18n="victory.clicks">Clicks</dt><dd id="victory-clicks"></dd></div>
+          <div class="victory-level">
+            <dt data-i18n="victory.difficulty">Difficulty</dt><dd id="victory-difficulty"></dd><dd id="victory-par"></dd>
+          </div>
+          <div><dt data-i18n="victory.best">Best</dt><dd id="victory-best"></dd></div>
+        </dl>
+        <p id="victory-record" hidden data-i18n="game.record">New personal best!</p>
+        <div class="victory-actions">
+          <button id="victory-share" type="button" class="button primary" autofocus data-i18n="victory.share">Share</button>
+          <button id="victory-new" type="button" class="button" data-i18n="game.new">New challenge</button>
+          <button id="victory-map" type="button" class="button" data-i18n="victory.viewMap">View the map</button>
+        </div>
+        <p id="victory-feedback" class="feedback" role="status" hidden></p>
+      </div>
+    </dialog>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

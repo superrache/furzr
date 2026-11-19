@@ -1,0 +1,127 @@
+import type { Messages } from "./en";
+
+export const sv: Messages = {
+  "meta.description":
+    "furzr erbjuder ett nytt sätt att utforska musikens värld: bläddra bland kopplingar mellan artister och band och lyssna på smakprov. Låt din musikkunskap växa som grenarna på ett träd.",
+  "map.label": "Karta över liknande artister",
+
+  "lang.label": "Språk",
+
+  "form.add": "Lägg till",
+  "sound.mute": "Stäng av ljudet",
+  "sound.unmute": "Slå på ljudet",
+  "sound.off": "Ljud av",
+  "sound.none": "Inget smakprov tillgängligt",
+  "sound.unavailable": "Tjänsten för smakprov är inte tillgänglig",
+
+  "mode.label": "Kartläge",
+  "mode.title": "Vad kartan kopplar samman",
+  "mode.similar": "Liknande",
+  "mode.influences": "Influenser",
+  "mode.movies": "Filmer",
+  "play.label": "Utforska eller spela",
+  "play.explore": "Utforska",
+  "play.game": "Spela",
+  "mode.confirmSwitch": "Om du byter läge rensas den aktuella kartan. Fortsätta?",
+  "confirm.continue": "Fortsätt",
+  "confirm.cancel": "Avbryt",
+
+  "input.label": "Artistnamn",
+  "input.artist": "Skriv ett artistnamn här",
+  "input.movie": "Skriv en filmtitel här",
+  "suggestions.label": "Förslag",
+  "suggestions.fans": "{n} fans",
+
+  "about.title": "Om appen",
+  "about.introHtml":
+    "<b>furzr</b> erbjuder ett originellt sätt att utforska musikens värld: bläddra bland kopplingar mellan artister och band och lyssna på smakprov. Låt din musikkunskap växa som grenarna på ett träd och upptäck vad du snart kommer att lyssna på.",
+  "about.howto":
+    "Skriv en artist och klicka sedan på valfritt namn för att utöka kartan. Dra namnen, scrolla eller nyp för att zooma.",
+  "about.growthHtml":
+    "<b>Orm</b> behåller bara vägen du följt: outforskade namn försvinner vid varje steg. <b>Träd</b> tar inte bort något och låter kartan växa i all oändlighet.",
+  "about.modesHtml":
+    "Tre lägen: <b>Liknande</b> artister, <b>Influenser</b> (vem som inspirerade en artist och vem artisten inspirerade) och, när det finns, <b>Filmer</b> (rekommenderade filmer).",
+  "about.gameHtml":
+    "<b>Spel</b>: koppla ihop två kända artister som ligger långt från varandra med kortast möjliga orm. Varje utmaning har en svårighetsgrad (lätt till extrem) som anger ett klickmål och poängen som står på spel: 1000 till 4000 inom målet, sedan 20 % mindre för varje extra klick.",
+  "about.creditsHtml":
+    "<b>furzr</b> använder data från {lastfm}, {wikidata} och {tmdb}, och ljudprov från {deezer}. Den här produkten använder TMDB:s API men är inte godkänd eller certifierad av TMDB.",
+  "legend.input": "dina artister",
+  "legend.exploded": "utforskade",
+  "legend.similar": "liknande",
+  "legend.target": "mål (spel)",
+
+  "share.tab": "Dela kartan",
+  "panel.close": "Stäng",
+  "share.copy": "Kopiera länk",
+  "share.native": "Dela…",
+  "share.urlLabel": "Länk till den här kartan",
+  "share.copied": "Länken har kopierats! Den som öppnar den ser den här kartan.",
+  "share.copyManually": "Kopiera den här länken för att dela din karta.",
+  "share.invalid": "Länken till den delade kartan är ogiltig",
+  "share.unavailable": "Den delade kartan kräver en datakälla som inte finns här",
+
+  "map.description": "Den här kartan visar hur {a} hänger ihop med {b}",
+  "map.empty.similar": "Utöka din artistkarta",
+  "map.empty.influences": "Utöka din influenskarta",
+  "map.empty.movies": "Utöka din filmkarta",
+  "map.empty.game": "Koppla ihop de två artisterna",
+
+  "notFound.similar": "Ingen känd artist heter så, prova en annan",
+  "notFound.influences": "Artisten är okänd för Wikidata, prova en annan",
+  "notFound.movies": "Ingen känd film har den titeln, prova en annan",
+  "noNeighbors.similar": "Den här artisten har inga liknande artister",
+  "noNeighbors.influences": "Wikidata känner inte till några influenser för den här artisten",
+  "noNeighbors.movies": "Inga rekommendationer för den här filmen",
+  "notFound.game": "Ingen känd artist heter så, prova en annan",
+  "noNeighbors.game": "Den här artisten har inga liknande artister",
+
+  "game.new": "Ny utmaning",
+  "game.loading": "Letar efter två artister långt ifrån varandra…",
+  "game.goal": "Koppla ihop {a} med {b}",
+  "game.start": "Koppla ihop {a} med {b} genom att klicka på liknande artister. Ju färre klick, desto högre poäng!",
+  "game.moves": "Klick: {n}",
+  "game.score": "Poäng: {score}",
+  "game.difficulty": "Svårighet: {level}",
+  "difficulty.1": "Lätt",
+  "difficulty.2": "Medel",
+  "difficulty.3": "Svår",
+  "difficulty.4": "Extrem",
+  "game.record": "Nytt personbästa!",
+  "game.result": "Resultat",
+  "game.failed": "Ingen utmaning hittades, försök igen",
+  "game.shareGoal": "furzr-utmaning: koppla ihop {a} med {b} med så få klick som möjligt",
+  "game.shareWon": "Jag kopplade ihop {a} med {b} på furzr. Klick: {n}, poäng: {score}. Kan du göra bättre?",
+
+  "victory.title": "Bra jobbat!",
+  "victory.perfect": "Perfekt!",
+  "victory.subtitle": "Du kopplade ihop {a} med {b}",
+  "victory.path": "Din väg",
+  "victory.score": "Poäng",
+  "victory.clicks": "Klick",
+  "victory.difficulty": "Svårighet",
+  "victory.par": "mål: {n} klick",
+  "victory.best": "Rekord",
+  "victory.share": "Dela",
+  "victory.viewMap": "Visa kartan",
+  "victory.copied": "Länken har kopierats! Skicka den till en vän och utmana hen.",
+  "tip.loading": "Laddar…",
+
+  "help.clickArtist": "Klicka på en artist för att utöka kartan",
+  "help.clickMovie": "Klicka på en film för att utöka kartan",
+  "help.share": "Ha kul och dela din karta!",
+
+  "growth.label": "Kartans tillväxt",
+  "growth.snake": "Orm",
+  "growth.tree": "Träd",
+  "growth.snakeTitle": "Outforskade namn försvinner vid varje steg, bara din väg finns kvar",
+  "growth.treeTitle": "Inget tas bort, kartan fortsätter att växa",
+  "growth.toSnake": "Orm: outforskade namn försvinner vid nästa klick",
+  "growth.toTree": "Träd: från och med nu tas inget bort från kartan",
+  "clear": "Rensa kartan",
+
+  "overview.about": "Om {name}",
+  "overview.readMore": "Läs mer på {source}",
+
+  "error.service": "Tjänsten är tillfälligt otillgänglig, försök igen om en stund",
+  "error.generic": "Något gick fel, försök igen",
+};
