@@ -3,5 +3,4 @@ dist/
 dist-e2e/
 test-results/
 playwright-report/
-.CLAUDE.md
 .env
