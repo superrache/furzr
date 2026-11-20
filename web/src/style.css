@@ -173,7 +173,8 @@ input:focus {
   --home-graph-h: clamp(110px, 28vh, 260px);
 }
 
-/* titre de l'accueil ; en quittant l'accueil, il fait un tour sur lui-même puis s'efface */
+/* titre de l'accueil : il fait un tour sur lui-même au démarrage, une fois la page révélée (fin de
+   html.booting, sinon le tour aurait lieu pendant qu'elle est encore masquée). Absent hors accueil. */
 #title {
   position: absolute;
   z-index: 21;
@@ -182,31 +183,23 @@ input:focus {
   transform: translateX(-50%);
   font-size: 2em;
   white-space: nowrap;
-  visibility: hidden;
   pointer-events: none;
+  display: none;
 }
 
 .start #title {
-  visibility: visible;
+  display: block;
 }
 
-.left-home:not(.start) #title {
-  animation: title-spin 0.8s ease-in-out both;
+html:not(.booting) .start #title {
+  animation: title-spin 0.8s ease-in-out;
 }
 
 @keyframes title-spin {
-  0% {
-    visibility: visible;
-    opacity: 1;
+  from {
     transform: translateX(-50%) rotate(0deg);
   }
-  75% {
-    opacity: 1;
-    transform: translateX(-50%) rotate(360deg);
-  }
-  100% {
-    visibility: hidden;
-    opacity: 0;
+  to {
     transform: translateX(-50%) rotate(360deg);
   }
 }

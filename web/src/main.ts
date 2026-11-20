@@ -1202,10 +1202,6 @@ class App {
   private leaveStartScreen(): void {
     this.homeGraph?.stop();
     this.homeGraph = null;
-    // le titre fait un tour sur lui-même avant de disparaître (seulement en quittant l'accueil)
-    if (document.body.classList.contains("start")) {
-      document.body.classList.add("left-home");
-    }
     document.body.classList.remove("start");
   }
 
