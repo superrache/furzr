@@ -844,8 +844,23 @@ body:not(.start) #toasts {
   width: 1.2em;
   height: 90px;
   margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
   accent-color: var(--accent);
   cursor: pointer;
+}
+
+/* pas le contour bleu des champs texte (input:focus) au clic ; au clavier, un simple halo sur le panneau */
+#volume-range:focus {
+  outline: none;
+  background: none;
+}
+
+#volume:has(#volume-range:focus-visible) {
+  box-shadow:
+    0 -2px 8px var(--shadow),
+    0 0 0 2px var(--accent);
 }
 
 @media (hover: hover) {
