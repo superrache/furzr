@@ -166,21 +166,67 @@ input:focus {
 
 /* ---------- titre et saisie : centrés au démarrage, puis rangés en haut ---------- */
 
+/* accueil : titre, graphe de démonstration et formulaire empilés depuis le haut */
+:root {
+  --home-top: max(16px, 7vh);
+  --home-title-h: 72px;
+  --home-graph-h: clamp(110px, 28vh, 260px);
+}
+
+/* titre de l'accueil ; en quittant l'accueil, il fait un tour sur lui-même puis s'efface */
 #title {
   position: absolute;
   z-index: 21;
-  left: 12px;
-  top: 8px;
-  font-size: 1em;
-  transition: all var(--transition);
+  left: 50%;
+  top: var(--home-top);
+  transform: translateX(-50%);
+  font-size: 2em;
+  white-space: nowrap;
+  visibility: hidden;
   pointer-events: none;
 }
 
 .start #title {
+  visibility: visible;
+}
+
+.left-home:not(.start) #title {
+  animation: title-spin 0.8s ease-in-out both;
+}
+
+@keyframes title-spin {
+  0% {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) rotate(0deg);
+  }
+  75% {
+    opacity: 1;
+    transform: translateX(-50%) rotate(360deg);
+  }
+  100% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+/* graphe de démonstration (HomeGraph) : décoratif, au-dessus du voile, sans interaction */
+#home-graph {
+  display: none;
+}
+
+.start #home-graph {
+  position: absolute;
+  z-index: 21;
   left: 50%;
-  top: 30%;
-  transform: translate(-50%, -110%);
-  font-size: 2em;
+  top: calc(var(--home-top) + var(--home-title-h));
+  display: block;
+  width: min(560px, calc(100vw - 32px));
+  height: var(--home-graph-h);
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
 }
 
 #artist-form {
@@ -189,15 +235,114 @@ input:focus {
   top: 5px;
   width: 420px;
   font-size: 1em;
-  transition: all var(--transition);
 }
 
 .start #artist-form {
   right: 50%;
-  top: 30%;
+  top: calc(var(--home-top) + var(--home-title-h) + var(--home-graph-h) + 8px);
   transform: translateX(50%);
-  width: min(600px, calc(100vw - 32px));
-  font-size: 1.6em;
+  width: min(560px, calc(100vw - 32px));
+  padding: 18px;
+  font-size: 1.15em;
+  /* une carte posée sur le voile, survolée ou non */
+  background-color: var(--panel);
+  border-radius: 10px;
+  box-shadow: 0 10px 40px var(--shadow);
+}
+
+/* ---------- accueil : le jeu d'abord, l'exploration en second ---------- */
+
+#home {
+  display: none;
+}
+
+.start #home {
+  display: block;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+#home-tagline {
+  margin: 0 auto 14px;
+  max-width: 30em;
+  font-size: 1.05em;
+  line-height: 1.4;
+  text-shadow: 0 1px 3px var(--shadow);
+}
+
+#artist-form #home-play {
+  float: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: min(260px, 100%);
+  height: auto;
+  margin: 0;
+  padding: 12px 28px;
+  font-size: 1.35em;
+  font-weight: bold;
+  color: white;
+  background: var(--accent-dark);
+  border-radius: 999px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+
+#artist-form #home-play:hover:not(:disabled),
+#artist-form #home-play:focus-visible {
+  background: var(--accent);
+}
+
+#artist-form #home-play:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 3px;
+}
+
+/* pendant le tirage : texte plus petit (« Recherche de deux artistes éloignés… ») */
+#artist-form #home-play:disabled {
+  opacity: 1;
+  font-size: 1em;
+  font-weight: normal;
+}
+
+#home-play .spinner {
+  border-color: white;
+  border-right-color: transparent;
+}
+
+#home-best {
+  margin: 10px 0 0;
+  color: var(--accent-text);
+}
+
+/* « ou explorez librement », entre deux traits */
+#artist-form #home-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 4px;
+  font-size: 0.85em;
+  color: var(--text-dim);
+}
+
+#home-or::before,
+#home-or::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+
+#artist-form #home-or span {
+  overflow: visible;
+}
+
+/* tirage lancé depuis l'accueil : seul le gros bouton (en attente) reste ; le champ revient si le tirage échoue */
+.start.game #home-or,
+.start.game #artist-submit,
+.start.game #mode,
+.start.game #input-box,
+.start #game-goal {
+  display: none;
 }
 
 #artist-form .button {
@@ -212,9 +357,15 @@ input:focus {
   font-size: 0.85em;
 }
 
+/* l'accueil a son propre bouton « Jouer » */
 .start #play-switch {
-  justify-content: center;
-  font-size: 0.7em;
+  display: none;
+}
+
+/* en exploration, « Jouer » attire l'œil : c'est l'usage principal */
+#play-switch [data-play="game"][aria-pressed="false"] {
+  color: var(--accent-text);
+  font-weight: bold;
 }
 
 #artist-form #play-switch .button {
@@ -265,10 +416,31 @@ input:focus {
   display: none;
 }
 
-/* mode jeu : défi « A → B · score » sur sa propre ligne, sous les boutons (passe à la ligne au besoin) */
+/* mode jeu : la barre devient une carte, le défi en tête (« A → B », puis clics, difficulté, résultat),
+   les boutons en dessous */
+body.game:not(.start) #artist-form {
+  background-color: var(--panel);
+  box-shadow: 0 3px 12px var(--shadow);
+}
+
 #artist-form #game-goal {
-  clear: both;
-  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#artist-form #game-goal .goal {
+  font-size: 1.15em;
+  font-weight: bold;
+}
+
+/* « Nouveau défi » : l'action principale en jeu */
+body.game #artist-submit:not(:disabled) {
+  color: white;
+  background: var(--accent-dark);
+}
+
+body.game #artist-submit:hover:not(:disabled),
+body.game #artist-submit:focus-visible {
+  background: var(--accent);
 }
 
 #game-goal {
@@ -310,13 +482,14 @@ input:focus {
 }
 
 #artist-form #game-goal .status {
-  display: inline;
-  opacity: 0.8;
+  margin-top: 2px;
+  font-size: 0.9em;
+  opacity: 0.85;
 }
 
-/* en jeu, le formulaire est plus haut (ligne du défi) : messages en dessous */
-body.game:not(.start) #toasts {
-  top: 85px;
+/* la hauteur du formulaire varie (défi sur 2 à 4 lignes) : les messages se placent dessous */
+body:not(.start) #toasts {
+  top: calc(5px + var(--form-height, 45px) + 8px);
 }
 
 /* auto-complétion */
@@ -329,8 +502,10 @@ body.game:not(.start) #toasts {
   margin: 2px 0 0;
   padding: 3px;
   list-style: none;
-  max-height: min(60vh, 360px);
+  /* jusqu'à 20 propositions, 6 visibles (ligne = image 1.9em + 2 × 4px), les autres en défilant */
+  max-height: min(60vh, calc(6 * (1.9em + 8px) + 6px));
   overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--surface);
   border-radius: 3px;
   box-shadow: 0 3px 8px var(--shadow);
@@ -374,10 +549,6 @@ body.game:not(.start) #toasts {
   flex: none;
   font-size: 0.75em;
   opacity: 0.7;
-}
-
-body:not(.start) #title {
-  opacity: 0;
 }
 
 .start #tools,
@@ -644,6 +815,57 @@ body:not(.start) #title {
   color: var(--text-dim);
 }
 
+/* volume : petit panneau vertical posé sur la note, qui se déplie vers le haut. Visible au survol de la note
+   (souris seulement), du panneau lui-même ou au focus clavier ; il reste focusable quand il est replié */
+#volume {
+  position: absolute;
+  bottom: calc(100% - 4px);
+  left: 3px;
+  display: flex;
+  justify-content: center;
+  width: calc(1.7em * 1.1);
+  padding: 10px 0 12px;
+  box-sizing: border-box;
+  background: var(--panel);
+  border-radius: 14px 14px 6px 6px;
+  box-shadow: 0 -2px 8px var(--shadow);
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: bottom;
+  pointer-events: none;
+  transition:
+    transform 0.15s ease-out 0.25s,
+    opacity 0.15s ease-out 0.25s;
+}
+
+#volume-range {
+  writing-mode: vertical-lr;
+  direction: rtl; /* fort en haut */
+  width: 1.2em;
+  height: 90px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  #player:has(.sound-note:hover) #volume,
+  #volume:hover {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+}
+
+#player:has(.sound-note:focus-visible) #volume,
+#volume:focus-within {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
 /* pendant la lecture, la note danse en mesure */
 .sound-note.playing span {
   display: inline-block;
@@ -784,14 +1006,6 @@ body:not(.start) #title {
 }
 
 @media (max-width: 720px) {
-  #title {
-    display: none;
-  }
-
-  .start #title {
-    display: block;
-  }
-
   #artist-form {
     left: 8px;
     right: 8px;
@@ -803,7 +1017,13 @@ body:not(.start) #title {
     left: 50%;
     right: auto;
     transform: translateX(-50%);
-    font-size: 1.2em;
+    font-size: 1.05em;
+  }
+
+  /* en jeu, l'interrupteur tient à gauche de « Nouveau défi » (en exploration, il garde sa ligne) */
+  body.game:not(.start) #play-switch {
+    float: left;
+    margin: 0 5px 0 0;
   }
 
   /* « furzr » et « Partager » : plus de volets qui glissent, mais deux boutons rangés sous le sélecteur
@@ -1045,7 +1265,7 @@ body:not(.start) #title {
   }
 
   #toasts,
-  body.game:not(.start) #toasts {
+  body:not(.start) #toasts {
     top: calc(5px + var(--form-height, 87px) + 50px);
     right: 16px;
     left: 16px;

@@ -92,6 +92,8 @@ export class MapView {
     private readonly container: HTMLElement,
     private readonly theme: MapViewTheme,
     onNodeClick: (node: MapNode) => void,
+    /** Marge du recadrage automatique, en pixels écran (plus petite pour le graphe de l'accueil). */
+    private readonly fitPadding?: number,
   ) {
     this.graph = new ForceGraph<MapNode, MapLink>(container)
       .backgroundColor(theme.background)
@@ -235,7 +237,7 @@ export class MapView {
     if (!box) {
       return;
     }
-    const padding = this.focusIds.size > 0 ? 60 : 80;
+    const padding = this.fitPadding ?? (this.focusIds.size > 0 ? 60 : 80);
     const width = Math.max(1, this.container.clientWidth - 2 * padding);
     const height = Math.max(1, this.container.clientHeight - 2 * padding);
     const zoom = Math.min(

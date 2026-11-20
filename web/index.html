@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="booting">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -15,18 +15,36 @@
     <meta property="og:image" content="furzr-logo-256.png" />
     <link rel="icon" href="favicon.ico" />
     <link rel="apple-touch-icon" href="apple-touch-icon-precomposed.png" />
+    <!-- page masquée jusqu'à ce que le CSS (injecté par le JS en dev) et la langue soient prêts : sinon on voit
+         un instant le HTML brut, en anglais. boot() retire « booting ». -->
+    <style>
+      html { background: #15191e; }
+      html.booting body { opacity: 0; }
+    </style>
+    <noscript><style>html.booting body { opacity: 1; }</style></noscript>
   </head>
   <body class="start">
     <div id="map" aria-label="Artist similarity map" data-i18n-attr="aria-label:map.label"></div>
     <div id="veil"></div>
 
     <header id="title"><h1>furzr</h1></header>
+    <!-- accueil : graphe de démonstration (même rendu que la carte), entre le titre et le formulaire -->
+    <div id="home-graph" aria-hidden="true"></div>
 
     <form id="artist-form" class="floating" autocomplete="off">
-      <!-- explorer librement ou jouer : deux usages distincts, au-dessus du champ -->
-      <div id="play-switch" class="segmented" role="group" aria-label="Explore or play" data-i18n-attr="aria-label:play.label">
-        <button type="button" class="button" data-play="explore" aria-pressed="true" data-i18n="play.explore">Explore</button>
+      <!-- accueil : le jeu d'abord (gros bouton), l'exploration ensuite (champ en dessous, plus discret) -->
+      <div id="home">
+        <p id="home-tagline" data-i18n="home.tagline">Link two famous artists through similar artists, in as few clicks as possible.</p>
+        <button id="home-play" type="button" class="button primary">Play</button>
+        <p id="home-best" hidden></p>
+        <p id="home-or"><span data-i18n="home.or">or explore freely</span></p>
+      </div>
+      <!-- sur la carte, en jeu : le défi en tête de la barre, au-dessus des boutons -->
+      <span id="game-goal" role="status" hidden></span>
+      <!-- jouer ou explorer librement (le jeu d'abord) : masqué sur l'accueil, qui a son propre bouton -->
+      <div id="play-switch" class="segmented" role="group" aria-label="Play or explore" data-i18n-attr="aria-label:play.label">
         <button type="button" class="button" data-play="game" aria-pressed="false" data-i18n="play.game">Play</button>
+        <button type="button" class="button" data-play="explore" aria-pressed="true" data-i18n="play.explore">Explore</button>
       </div>
       <button id="artist-submit" type="submit" class="button" data-i18n="form.add">Add</button>
       <select id="mode" class="button" aria-label="Map mode" title="What the map links together" data-i18n-attr="aria-label:mode.label;title:mode.title">
@@ -34,7 +52,6 @@
         <option value="influences" data-i18n="mode.influences">Influences</option>
         <option value="movies" data-i18n="mode.movies">Movies</option>
       </select>
-      <span id="game-goal" role="status" hidden></span>
       <span id="input-box"><input id="artist-input" type="search" placeholder="Give a music artist name here" aria-label="Artist name" data-i18n-attr="aria-label:input.label" /></span>
     </form>
 
@@ -54,6 +71,10 @@
             and listening samples. This app lets you expand your musical knowledge like the leaves of a tree and find out what
             you will be listening soon.
           </p>
+          <p data-i18n-html="about.gameHtml">
+            <b>Game</b>: link two well-known artists, far apart from each other, with the shortest possible snake.
+            The best is 2 clicks for 1000 points; every extra click halves the score.
+          </p>
           <p data-i18n="about.howto">
             Type an artist, then click on any name to expand the map. Drag names around, scroll or pinch to zoom.
           </p>
@@ -64,10 +85,6 @@
           <p data-i18n-html="about.modesHtml">
             Three modes: <b>Similar</b> artists, <b>Influences</b> (who inspired an artist, and whom they inspired) and,
             when available, <b>Movies</b> (recommended films).
-          </p>
-          <p data-i18n-html="about.gameHtml">
-            <b>Game</b>: link two well-known artists, far apart from each other, with the shortest possible snake.
-            The best is 2 clicks for 1000 points; every extra click halves the score.
           </p>
           <p data-i18n-html="about.creditsHtml">
             <b>furzr</b> uses data from <a href="https://www.last.fm" target="_blank" rel="noopener">Last.fm</a>,
@@ -143,6 +160,10 @@
          plus), toujours visible en bas, centré -->
     <div id="player" hidden>
       <div id="sound-title" aria-live="polite"></div>
+      <!-- volume : s'ouvre vers le haut au survol de la note (ou au focus clavier) -->
+      <div id="volume">
+        <input id="volume-range" type="range" min="0" max="100" step="5" value="70" data-i18n-attr="aria-label:sound.volume;title:sound.volume" />
+      </div>
     </div>
 
     <div id="toasts" aria-live="polite"></div>

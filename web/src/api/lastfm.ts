@@ -1,5 +1,5 @@
 import { ServiceError, type Artist, type ArtistInfo, type SimilarityProvider, type Suggestion } from "./types";
-import type { DeezerClient } from "./deezer";
+import type { DeezerArtist, DeezerClient } from "./deezer";
 import { sanitizeBio } from "../ui/html";
 import type { LangGetter } from "../i18n/languages";
 
@@ -52,6 +52,8 @@ export class LastFmProvider implements SimilarityProvider {
     private readonly deezer: DeezerClient | null,
     private readonly fetcher: JsonFetcher = defaultFetcher,
     private readonly lang: LangGetter = () => "en",
+    /** Artiste Deezer d'un artiste Last.fm, pour la photo (DeezerMatcher) ; à défaut, recherche par nom. */
+    private readonly deezerArtist?: (artist: Artist) => Promise<DeezerArtist | null>,
   ) {}
 
   private async call<T>(params: Record<string, string>): Promise<T & { error?: number; message?: string }> {
@@ -111,6 +113,18 @@ export class LastFmProvider implements SimilarityProvider {
       : [];
   }
 
+  /** Titres les plus écoutés : servent à vérifier qu'un artiste Deezer homonyme est bien le même. */
+  async getTopTrackTitles(artist: Artist, limit = 30): Promise<string[]> {
+    const data = await this.call<{ toptracks?: { track?: { name?: string }[] | { name?: string } } }>({
+      method: "artist.gettoptracks",
+      limit: String(limit),
+      ...this.artistParams(artist),
+    });
+    const raw = data.toptracks?.track;
+    const tracks = Array.isArray(raw) ? raw : raw ? [raw] : [];
+    return tracks.map((t) => t.name ?? "").filter(Boolean);
+  }
+
   private fetchInfo(artist: Artist, lang: string) {
     return this.call<{
       artist?: { name: string; url: string; bio?: { summary?: string }; tags?: { tag?: { name: string }[] | { name: string } } };
@@ -125,7 +139,12 @@ export class LastFmProvider implements SimilarityProvider {
     const lang = this.lang();
     const [data, picture] = await Promise.all([
       this.fetchInfo(artist, lang),
-      this.deezer ? this.deezer.findArtist(artist.name).catch(() => null) : Promise.resolve(null),
+      (this.deezerArtist
+        ? this.deezerArtist(artist)
+        : this.deezer
+          ? this.deezer.findArtist(artist.name)
+          : Promise.resolve(null)
+      ).catch(() => null),
     ]);
     const a = data.artist;
     if (!a) {

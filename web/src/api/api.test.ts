@@ -157,16 +157,34 @@ describe("artist suggestions", () => {
     expect(ranked[0]).toEqual({ name: "Sigur Rós", picture: "Sigur Rós.jpg", fans: 300 });
   });
 
-  it("primes the artist cache so picking a suggestion needs no new search", async () => {
+  it("keeps the most popular homonym, not Deezer's first one (Oasis, Queen)", () => {
+    const ranked = rankSuggestions(
+      "oasis",
+      [artist("Oasis", 470), artist("Oasis", 83), artist("Oasis", 4_724_082), artist("Adi Oasis", 8280)],
+      6,
+    );
+    expect(ranked.map((s) => [s.name, s.fans])).toEqual([
+      ["Oasis", 4_724_082],
+      ["Adi Oasis", 8280],
+    ]);
+  });
+
+  it("asks Deezer for many results and returns up to 20 suggestions", async () => {
     const urls: string[] = [];
     const deezer = new DeezerClient(async <T>(url: string) => {
       urls.push(url);
-      return { data: [artist("Daft", 134), artist("Daft Punk", 5_000_000)] } as T;
+      return { data: Array.from({ length: 50 }, (_, i) => artist(`Queen ${i}`, 50 - i)) } as T;
     });
-    const suggestions = await deezer.suggestArtists("daft");
-    expect(suggestions.map((s) => s.name)).toEqual(["Daft Punk", "Daft"]);
-    expect((await deezer.findArtist("Daft Punk"))!.nb_fan).toBe(5_000_000);
-    expect(urls).toHaveLength(1);
+    const suggestions = await deezer.suggestArtists("queen");
+    expect(suggestions).toHaveLength(20);
+    expect(new URL(urls[0]).searchParams.get("limit")).toBe("50");
+  });
+
+  it("finds the most popular exact homonym by name", async () => {
+    const deezer = new DeezerClient(
+      async <T>() => ({ data: [artist("Queen", 52), artist("Queen Latifah", 69_714), artist("Queen", 12_876_813)] }) as T,
+    );
+    expect((await deezer.findArtist("queen"))!.nb_fan).toBe(12_876_813);
   });
 });
 

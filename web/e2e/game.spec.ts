@@ -76,4 +76,39 @@ test.describe("mode jeu", () => {
     await page.waitForTimeout(300);
     await expect(page.locator("#victory-feedback")).toBeHidden();
   });
+
+  test("accueil : le gros bouton « Play » lance un défi, l'exploration reste possible", async ({ page }) => {
+    const errors = collectErrors(page);
+    await mockApis(page);
+    await page.addInitScript(() => localStorage.setItem("furzr.game.best", "2400"));
+    await page.goto("./");
+    const play = page.locator("#home-play");
+    await expect(page.locator("body")).toHaveClass(/start/);
+    await expect(play).toHaveText("Play");
+    await expect(play).toBeFocused();
+    await expect(page.locator("#home-best")).toHaveText("Your best score: 2400");
+    // l'exploration est en second : champ visible, interrupteur masqué
+    await expect(page.locator("#artist-input")).toBeVisible();
+    await expect(page.locator("#play-switch")).toBeHidden();
+
+    await play.click();
+    const bar = page.locator("#game-goal");
+    await expect(bar).toContainText(/(Alpha → Zeta|Zeta → Alpha)/);
+    await expect(page.locator("body")).not.toHaveClass(/start/);
+    // sur la carte : le défi en tête de la barre, « Play » d'abord dans l'interrupteur
+    const switchButtons = page.locator("#play-switch [data-play]");
+    await expect(switchButtons.first()).toHaveAttribute("data-play", "game");
+    await expect(switchButtons.first()).toHaveAttribute("aria-pressed", "true");
+    await page.waitForTimeout(800); // le formulaire quitte l'accueil (transition)
+    const barBox = (await bar.boundingBox())!;
+    const switchBox = (await page.locator("#play-switch").boundingBox())!;
+    expect(barBox.y + barBox.height).toBeLessThanOrEqual(switchBox.y + 1);
+
+    // retour à l'exploration
+    await page.locator('#play-switch [data-play="explore"]').click();
+    await page.locator("#confirm-ok").click();
+    await expect(bar).toBeHidden();
+    await expect(page.locator("#artist-input")).toBeVisible();
+    expect(errors).toEqual([]);
+  });
 });

@@ -37,6 +37,23 @@ async function expectNoOverlap(page: Page): Promise<void> {
 }
 
 test.describe("mise en page", () => {
+  test("accueil : la carte d'accueil tient dans l'écran, sous le sélecteur de langue", async ({ page }) => {
+    await mockApis(page);
+    await page.goto("./");
+    await page.waitForTimeout(800); // transitions
+    const form = (await page.locator("#artist-form").boundingBox())!;
+    const lang = (await page.locator("#lang-box").boundingBox())!;
+    const { width, height } = page.viewportSize()!;
+    expect(overlaps(form, lang)).toBe(false);
+    expect(form.x).toBeGreaterThanOrEqual(0);
+    expect(form.x + form.width).toBeLessThanOrEqual(width);
+    expect(form.y + form.height).toBeLessThanOrEqual(height);
+    // le bouton « Play » passe avant le champ d'exploration
+    const play = (await page.locator("#home-play").boundingBox())!;
+    const input = (await page.locator("#artist-input").boundingBox())!;
+    expect(play.y + play.height).toBeLessThan(input.y);
+  });
+
   test("carte d'exploration", async ({ page }) => {
     await mockApis(page);
     await page.goto("./");

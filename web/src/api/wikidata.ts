@@ -39,6 +39,34 @@ const QID = /^Q\d+$/;
 /** « http://www.wikidata.org/entity/Q44190 » → « Q44190 ». */
 const qidOf = (uri: string) => uri.slice(uri.lastIndexOf("/") + 1);
 
+const MBID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+/**
+ * Identifiants Deezer d'artistes (P2722) d'après leur MBID (P434), en une seule requête SPARQL.
+ * C'est le lien sûr entre un artiste Last.fm et Deezer, qui n'ont pas d'identifiant commun.
+ * Les MBID sont validés avant d'être insérés dans la requête. Si un artiste a plusieurs
+ * identifiants Deezer, le premier rencontré est gardé.
+ */
+export async function deezerIdsByMbid(mbids: string[], fetcher: JsonFetcher = defaultFetcher): Promise<Map<string, number>> {
+  const valid = [...new Set(mbids.map((m) => m.toLowerCase()))].filter((m) => MBID.test(m));
+  const ids = new Map<string, number>();
+  if (valid.length === 0) {
+    return ids;
+  }
+  const query = `SELECT ?mbid ?deezer WHERE { VALUES ?mbid { ${valid.map((m) => `"${m}"`).join(" ")} } ?item wdt:P434 ?mbid; wdt:P2722 ?deezer. }`;
+  const data = (await fetcher(`${SPARQL_URL}?${new URLSearchParams({ query, format: "json" })}`)) as {
+    results?: { bindings?: Binding[] };
+  };
+  for (const b of data.results?.bindings ?? []) {
+    const mbid = b.mbid?.value;
+    const id = Number(b.deezer?.value);
+    if (mbid && Number.isInteger(id) && id > 0 && !ids.has(mbid)) {
+      ids.set(mbid, id);
+    }
+  }
+  return ids;
+}
+
 /** Partie d'un fournisseur réutilisée pour la fiche et les propositions (Last.fm + Deezer). */
 export type InfoSource = Pick<SimilarityProvider, "getInfo" | "suggest">;
 

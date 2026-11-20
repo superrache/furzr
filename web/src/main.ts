@@ -1,17 +1,20 @@
 import "./style.css";
+import { DeezerMatcher } from "./api/artist-match";
 import { DeezerClient } from "./api/deezer";
 import { LastFmProvider } from "./api/lastfm";
 import { TmdbProvider } from "./api/tmdb";
-import { WikidataProvider } from "./api/wikidata";
+import { WikidataProvider, deezerIdsByMbid } from "./api/wikidata";
 import { ServiceError, type Artist, type ArtistInfo, type SimilarityProvider, type Suggestion } from "./api/types";
 import { ArtistMap, normalizeName, type Growth, type MapNode } from "./graph/model";
 import { decodeSnapshot, encodeSnapshot } from "./graph/share";
 import { MapView, themeFromCss } from "./graph/view";
 import { Autocomplete } from "./ui/autocomplete";
+import { DEFAULT_VOLUME } from "./ui/preview";
 import { byId, closeDrawers, confirmDialog, exposeHeight, prefs, setupDrawers, toast } from "./ui/dom";
 import { escapeHtml } from "./ui/html";
 import { ArtistTip } from "./ui/artist-tip";
 import { launchConfetti } from "./ui/confetti";
+import { HomeGraph } from "./ui/home-graph";
 import { PreviewPlayer, type PreviewStatus } from "./ui/preview";
 import {
   CHART_SIZE,
@@ -59,6 +62,8 @@ interface Mode {
 
 class App {
   private readonly deezer = new DeezerClient();
+  /** Artiste Deezer (extraits, photos) d'un artiste Last.fm : MBID via Wikidata, sinon nom vérifié. */
+  private readonly matcher: DeezerMatcher;
   private readonly modes = new Map<ModeId, Mode>();
   private mode: Mode;
   /** Dernier mode d'exploration (similaires, influences, films) : on y revient en quittant le jeu. */
@@ -109,14 +114,22 @@ class App {
   private readonly submit = byId<HTMLButtonElement>("artist-submit");
   private readonly autocomplete: Autocomplete;
   private readonly modeSelect = byId<HTMLSelectElement>("mode");
+  private readonly homePlay = byId<HTMLButtonElement>("home-play");
+  /** Graphe de démonstration de l'accueil, détruit en quittant l'accueil. */
+  private homeGraph: HomeGraph | null = null;
 
   constructor() {
     if (!LASTFM_KEY) {
       throw new Error("VITE_LASTFM_API_KEY is missing (see web/.env)");
     }
     // les fournisseurs lisent la langue à chaque appel : un changement s'applique aux requêtes suivantes
-    const lastfm = new LastFmProvider(LASTFM_KEY, this.deezer, undefined, getLang);
+    const lastfm = new LastFmProvider(LASTFM_KEY, this.deezer, undefined, getLang, (a) => this.matcher.match(a));
     this.lastfm = lastfm;
+    this.matcher = new DeezerMatcher({
+      deezer: this.deezer,
+      deezerIds: (mbids) => deezerIdsByMbid(mbids),
+      topTrackTitles: (artist) => lastfm.getTopTrackTitles(artist),
+    });
     this.addMode({ id: "similar", provider: lastfm });
     this.addMode({ id: "influences", provider: new WikidataProvider(lastfm, undefined, getLang) });
     if (TMDB_KEY) {
@@ -130,7 +143,9 @@ class App {
 
     const soundParam = params.get("sound");
     const soundOn = soundParam ? soundParam !== "off" : prefs.get("sound") !== "off";
-    this.player = new PreviewPlayer(this.deezer, soundOn, (status) => this.renderSound(status));
+    const savedVolume = Number(prefs.get("volume") ?? NaN);
+    const volume = Number.isFinite(savedVolume) ? savedVolume / 100 : DEFAULT_VOLUME;
+    this.player = new PreviewPlayer(this.deezer, (a) => this.matcher.match(a), soundOn, (status) => this.renderSound(status), volume);
 
     setupDrawers();
     // lecteur posé à 8 px du bas : la fiche et les outils se placent 6 px au-dessus
@@ -150,6 +165,11 @@ class App {
       }
     }
     this.modeSelect.addEventListener("change", () => this.onModeChange());
+    // accueil : le gros bouton lance un défi (relance seulement si le jeu est déjà le mode courant)
+    this.homePlay.addEventListener("click", () =>
+      void (this.isGame ? this.newChallenge() : this.switchMode(this.modes.get("game")!)),
+    );
+    this.renderHome();
     for (const button of this.playButtons()) {
       button.addEventListener("click", () =>
         void this.switchMode(button.dataset.play === "game" ? this.modes.get("game")! : this.exploreMode),
@@ -172,6 +192,13 @@ class App {
       if ((e.target as Element).closest(".sound-note")) {
         this.toggleSound();
       }
+    });
+    // volume des extraits, mémorisé
+    const volumeRange = byId<HTMLInputElement>("volume-range");
+    volumeRange.value = String(Math.round(volume * 100));
+    volumeRange.addEventListener("input", () => {
+      this.player.setVolume(Number(volumeRange.value) / 100);
+      prefs.set("volume", volumeRange.value);
     });
     // en jeu, vider la carte = recommencer le même défi
     byId("clear").addEventListener("click", () => (this.isGame && this.challenge ? void this.startChallenge(this.challenge) : this.clear()));
@@ -204,8 +231,29 @@ class App {
       this.input.value = artist;
       await this.addArtist(artist);
     } else {
-      this.input.focus();
+      // le jeu est l'usage principal : Entrée lance un défi ; classement préchargé pour un tirage rapide
+      this.homePlay.focus();
+      void this.gamePoolOnce().catch(() => undefined);
+      this.homeGraph = new HomeGraph(
+        byId("home-graph"),
+        themeFromCss(),
+        () => this.gamePoolOnce(),
+        (artist) => this.cachedSimilars(artist),
+      );
     }
+  }
+
+  /** Accueil : libellé du gros bouton (sablier pendant le tirage) et record personnel. */
+  private renderHome(): void {
+    const busy = this.isGame && !this.challenge && this.submit.disabled;
+    this.homePlay.disabled = busy;
+    this.homePlay.innerHTML = busy
+      ? `<span class="spinner"></span> ${escapeHtml(t("game.loading"))}`
+      : escapeHtml(t("home.play"));
+    const best = Number(prefs.get("game.best")) || 0;
+    const bestLine = byId("home-best");
+    bestLine.hidden = best <= 0;
+    bestLine.textContent = best > 0 ? t("home.best", { score: best }) : "";
   }
 
   // ---------- carte ----------
@@ -229,6 +277,7 @@ class App {
       if (provider !== this.mode.provider) {
         return; // mode changé pendant la requête
       }
+      this.prefetchDeezer(provider, similars.slice(0, SIMILAR_NUMBER));
       if (similars.length === 0) {
         toast(t(`noNeighbors.${id}`), { error: true });
         return;
@@ -274,6 +323,7 @@ class App {
           toast(t(`noNeighbors.${id}`), { error: true });
           return;
         }
+        this.prefetchDeezer(provider, list.slice(0, SIMILAR_NUMBER));
         this.map.expand(node.id, list, SIMILAR_NUMBER);
         this.refresh(true, node.id);
         this.checkGame();
@@ -287,15 +337,22 @@ class App {
     }
   }
 
+  /** Identifiants Deezer des nouveaux nœuds demandés d'un coup (une requête Wikidata), avant le clic. */
+  private prefetchDeezer(provider: SimilarityProvider, artists: Artist[]): void {
+    if (provider.kind === "music") {
+      this.matcher.prefetch(artists);
+    }
+  }
+
   private enqueue(task: () => void | Promise<void>): Promise<void> {
     const run = this.applyQueue.then(task);
     this.applyQueue = run.catch(() => undefined);
     return run;
   }
 
-  /** `focusId` : cadrer sur ce nœud et ses voisins plutôt que sur toute la carte. */
+  /** `focusId` : cadrer sur ce nœud et ses enfants plutôt que sur toute la carte. */
   private refresh(fit = true, focusId?: string): void {
-    const focus = focusId ? this.map.neighborhood(focusId) : undefined;
+    const focus = focusId ? this.map.focusSet(focusId) : undefined;
     this.view.update(this.map.graphData(), fit, focus);
     this.renderShare();
   }
@@ -369,21 +426,30 @@ class App {
       if (request === this.gameRequest) {
         this.setBusy(false);
         this.renderGame();
+        // échec depuis l'accueil : on y reste, et le champ d'exploration (masqué pendant le tirage) revient
+        if (!this.challenge && this.isGame && document.body.classList.contains("start")) {
+          this.setMode(this.exploreMode);
+        }
       }
     }
   }
 
-  private async drawChallenge(): Promise<Challenge | null> {
-    // classement chargé une fois par session
-    this.gamePool ??= this.lastfm.getTopArtists(CHART_SIZE).then((chart) => popularPool(chart));
-    let pool: Artist[];
-    try {
-      pool = await this.gamePool;
-    } catch (e) {
-      this.gamePool = null;
-      throw e;
+  /** Classement chargé une fois par session (un échec n'est pas gardé). */
+  private gamePoolOnce(): Promise<Artist[]> {
+    if (!this.gamePool) {
+      const pool = this.lastfm.getTopArtists(CHART_SIZE).then((chart) => popularPool(chart));
+      pool.catch(() => {
+        if (this.gamePool === pool) {
+          this.gamePool = null;
+        }
+      });
+      this.gamePool = pool;
     }
-    return pickChallenge(pool, (artist) => this.cachedSimilars(artist));
+    return this.gamePool;
+  }
+
+  private async drawChallenge(): Promise<Challenge | null> {
+    return pickChallenge(await this.gamePoolOnce(), (artist) => this.cachedSimilars(artist));
   }
 
   /** Défi partagé : les noms sont recherchés tels quels, sans contrôle de distance. */
@@ -735,9 +801,12 @@ class App {
         this.artistTip.attach(el, artist.name, () => this.cachedInfo(artist));
         return el;
       };
+      const goal = document.createElement("span");
+      goal.className = "goal";
+      goal.append(name("from", from), " → ", name("to", to));
       const status = document.createElement("span");
       status.className = "status";
-      bar.replaceChildren(name("from", from), " → ", name("to", to), status);
+      bar.replaceChildren(goal, status);
       this.gameBar = { key, status };
     }
     const score = this.gameResult?.score;
@@ -748,8 +817,8 @@ class App {
       span.textContent = text;
       return span;
     };
+    // état du défi sur sa propre ligne, sous les deux noms
     this.gameBar.status.replaceChildren(
-      " · ",
       part(score != null ? t("game.score", { score }) : t("game.moves", { n: this.map.exploredCount })),
       " · ",
       part(t("game.difficulty", { level: level ? t(`difficulty.${level}`) : "…" })),
@@ -792,7 +861,7 @@ class App {
     byId("overview-bio").textContent = "";
     byId<HTMLImageElement>("overview-image").hidden = true;
     if (provider.kind === "music") {
-      void this.player.load(artist.name);
+      void this.player.load(artist);
     } else {
       this.player.stop();
       this.renderSound({ state: "off" });
@@ -1015,6 +1084,7 @@ class App {
     this.renderShare();
     this.renderGame();
     this.renderVictory();
+    this.renderHome();
     if (!this.submit.disabled) {
       this.submit.textContent = this.submitLabel();
     }
@@ -1130,12 +1200,19 @@ class App {
   // ---------- divers ----------
 
   private leaveStartScreen(): void {
+    this.homeGraph?.stop();
+    this.homeGraph = null;
+    // le titre fait un tour sur lui-même avant de disparaître (seulement en quittant l'accueil)
+    if (document.body.classList.contains("start")) {
+      document.body.classList.add("left-home");
+    }
     document.body.classList.remove("start");
   }
 
   private setBusy(busy: boolean): void {
     this.submit.disabled = busy;
     this.submit.innerHTML = busy ? '<span class="spinner"></span>' : escapeHtml(this.submitLabel());
+    this.renderHome();
   }
 
   private submitLabel(): string {
@@ -1154,9 +1231,20 @@ class App {
 
 /** Langue choisie avant tout rendu : URL (?lang=fr), choix mémorisé, puis navigateur. */
 async function boot(): Promise<void> {
-  await setLang(detectLang(params.get("lang"), prefs.get("lang"), navigator.languages ?? [navigator.language]));
-  translateDocument();
-  await new App().start();
+  let app: App;
+  try {
+    await setLang(detectLang(params.get("lang"), prefs.get("lang"), navigator.languages ?? [navigator.language]));
+    translateDocument();
+    app = new App();
+  } finally {
+    reveal();
+  }
+  await app.start();
+}
+
+/** Affiche la page, masquée par « booting » le temps de charger le CSS et la langue. */
+function reveal(): void {
+  document.documentElement.classList.remove("booting");
 }
 
 void boot();

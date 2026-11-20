@@ -186,7 +186,26 @@ export class ArtistMap {
     return path;
   }
 
-  /** Un nœud et ses voisins directs : ce qu'on cadre après une expansion. */
+  /**
+   * Ce qu'on cadre après une expansion : le nœud et ses enfants (similaires qu'il a ajoutés),
+   * sans le nœud d'où l'on vient. Sinon, le parent tire le cadrage vers lui et les enfants
+   * du côté opposé sortent de l'écran.
+   */
+  focusSet(id: string): Set<string> {
+    const ids = new Set<string>();
+    if (!this.nodes.has(id)) {
+      return ids;
+    }
+    ids.add(id);
+    for (const link of this.links.values()) {
+      if (link.from === id) {
+        ids.add(link.to);
+      }
+    }
+    return ids;
+  }
+
+  /** Un nœud et ses voisins directs, dans les deux sens (parcours de `shortestPath`). */
   neighborhood(id: string): Set<string> {
     const ids = new Set<string>();
     if (!this.nodes.has(id)) {

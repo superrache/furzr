@@ -44,6 +44,58 @@ test.describe("exploration", () => {
     await expect(page.locator("#sound-title .sound-note")).toHaveClass(/playing/);
   });
 
+  test("le volume s'ouvre au survol de la note, à 70 % par défaut, et il est mémorisé", async ({ page, isMobile }) => {
+    test.skip(isMobile, "pas de survol sur écran tactile");
+    // le lecteur n'est pas dans le DOM : on note le dernier volume appliqué
+    await page.addInitScript(() => {
+      const desc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, "volume")!;
+      Object.defineProperty(HTMLMediaElement.prototype, "volume", {
+        ...desc,
+        set(v: number) {
+          (window as unknown as { lastVolume: number }).lastVolume = v;
+          desc.set!.call(this, v);
+        },
+      });
+    });
+    await mockApis(page);
+    await page.goto("./");
+    await addArtist(page, "Alpha");
+    const note = page.locator("#sound-title .sound-note");
+    const volume = page.locator("#volume");
+    const range = page.locator("#volume-range");
+    await expect(note).toHaveClass(/playing/);
+    await expect(volume).toHaveCSS("opacity", "0");
+    expect(await page.evaluate(() => (window as unknown as { lastVolume: number }).lastVolume)).toBe(0.7);
+
+    await note.hover();
+    await expect(volume).toHaveCSS("opacity", "1");
+    await expect(range).toHaveValue("70");
+    // posé au-dessus de la note, plus haut que large
+    const [n, v] = [(await note.boundingBox())!, (await volume.boundingBox())!];
+    expect(v.y + v.height).toBeLessThanOrEqual(n.y + 6);
+    expect(Math.abs(v.x + v.width / 2 - (n.x + n.width / 2))).toBeLessThan(4);
+    expect(v.height).toBeGreaterThan(v.width * 2);
+
+    // on monte de la note au curseur sans qu'il se referme, puis on baisse le son
+    await range.hover();
+    await expect(volume).toHaveCSS("opacity", "1");
+    await range.focus();
+    for (let i = 0; i < 4; i++) {
+      await page.keyboard.press("ArrowDown");
+    }
+    await expect(range).toHaveValue("50");
+    expect(await page.evaluate(() => (window as unknown as { lastVolume: number }).lastVolume)).toBe(0.5);
+
+    await page.mouse.move(5, 5);
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+    await expect(volume).toHaveCSS("opacity", "0");
+
+    await page.reload();
+    await addArtist(page, "Alpha");
+    await expect(range).toHaveValue("50");
+    expect(await page.evaluate(() => (window as unknown as { lastVolume: number }).lastVolume)).toBe(0.5);
+  });
+
   test("la fiche se déplie depuis son onglet", async ({ page, isMobile }) => {
     await mockApis(page);
     await page.goto("./");

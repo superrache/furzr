@@ -6,7 +6,8 @@ import { expect, type Page, type Route } from "@playwright/test";
  * - « Alpha » a pour similaires « Beta 1 » à « Beta 20 » ;
  * - chaque « Beta n » a pour similaires « Beta n.1 » à « Beta n.20 », précédés de `target` s'il est donné
  *   (mode jeu : la cible apparaît au premier clic) ;
- * - tout autre artiste a des similaires « <nom>.1 » à « <nom>.20 ».
+ * - tout autre artiste a des similaires « <nom>.1 » à « <nom>.20 » ;
+ * - le classement (mode jeu) contient « Alpha » et « Zeta », éloignés l'un de l'autre.
  *
  * Toute requête externe non simulée est bloquée (et notée dans `unmocked`).
  */
@@ -79,6 +80,14 @@ function lastfm(url: URL, options: MockOptions): unknown {
           },
           tags: { tag: [{ name: "rock" }, { name: "test" }] },
         },
+      };
+    case "artist.gettoptracks":
+      // mêmes titres que les extraits Deezer simulés : la vérification de l'homonyme réussit
+      return { toptracks: { track: [{ name: "Test Song 1" }, { name: "Test Song 2" }] } };
+    case "chart.gettopartists":
+      // deux artistes populaires sans similaire commun : le tirage du mode jeu les retient
+      return {
+        artists: { artist: ["Alpha", "Zeta"].map((name) => ({ name, mbid: "", listeners: "5000000" })) },
       };
     default:
       return { error: 3, message: "Invalid method (e2e mock)" };

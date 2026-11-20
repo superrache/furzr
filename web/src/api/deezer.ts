@@ -23,22 +23,28 @@ export function normalizeName(name: string): string {
   return name.normalize("NFD").replace(/\p{M}/gu, "").trim().toLowerCase();
 }
 
+/** Homonymes : on garde le plus écouté (Deezer classe mal : le groupe Oasis vient après deux inconnus). */
+function mostPopularByName(artists: DeezerArtist[]): DeezerArtist[] {
+  const best = new Map<string, DeezerArtist>();
+  for (const artist of artists) {
+    const key = normalizeName(artist.name);
+    const current = best.get(key);
+    if (key && (!current || (artist.nb_fan ?? 0) > (current.nb_fan ?? 0))) {
+      best.set(key, artist);
+    }
+  }
+  // ordre de Deezer conservé (position du premier homonyme)
+  return [...best.values()].sort((a, b) => artists.indexOf(a) - artists.indexOf(b));
+}
+
 /**
  * Classe les résultats de recherche Deezer pour l'auto-complétion : les noms qui
  * commencent par la saisie d'abord, du plus au moins écouté, puis les autres dans
- * l'ordre de Deezer. Les doublons de nom sont retirés.
+ * l'ordre de Deezer. Entre homonymes, seul le plus écouté est gardé.
  */
 export function rankSuggestions(query: string, artists: DeezerArtist[], limit: number): Suggestion[] {
   const q = normalizeName(query);
-  const seen = new Set<string>();
-  const unique = artists.filter((a) => {
-    const key = normalizeName(a.name);
-    if (!key || seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
-    return true;
-  });
+  const unique = mostPopularByName(artists);
   const prefix = unique
     .filter((a) => normalizeName(a.name).startsWith(q))
     .sort((a, b) => (b.nb_fan ?? 0) - (a.nb_fan ?? 0));
@@ -48,6 +54,12 @@ export function rankSuggestions(query: string, artists: DeezerArtist[], limit: n
     picture: a.picture_small || undefined,
     fans: a.nb_fan || undefined,
   }));
+}
+
+/** Homonymes exacts (casse et accents ignorés), du plus au moins écouté. */
+export function exactMatches(name: string, artists: DeezerArtist[]): DeezerArtist[] {
+  const key = normalizeName(name);
+  return artists.filter((a) => normalizeName(a.name) === key).sort((a, b) => (b.nb_fan ?? 0) - (a.nb_fan ?? 0));
 }
 
 interface DeezerTrack {
@@ -63,7 +75,7 @@ interface DeezerTrack {
 type Fetcher = <T>(url: string) => Promise<T>;
 
 export class DeezerClient {
-  private artistCache = new Map<string, Promise<DeezerArtist | null>>();
+  private searchCache = new Map<string, Promise<DeezerArtist[]>>();
 
   constructor(private readonly fetcher: Fetcher = jsonp) {}
 
@@ -79,34 +91,44 @@ export class DeezerClient {
     return resp;
   }
 
-  /** Artiste Deezer correspondant à un nom (correspondance exacte préférée), mis en cache. */
-  findArtist(name: string): Promise<DeezerArtist | null> {
-    const key = name.trim().toLowerCase();
-    let cached = this.artistCache.get(key);
+  /** Résultats bruts d'une recherche d'artiste par nom, mis en cache (pas les échecs). */
+  searchArtists(name: string): Promise<DeezerArtist[]> {
+    const key = normalizeName(name);
+    let cached = this.searchCache.get(key);
     if (!cached) {
-      cached = this.call<{ data?: DeezerArtist[] }>("search/artist", { q: name, limit: 5 }).then((resp) => {
-        const artists = resp.data ?? [];
-        return artists.find((a) => a.name.toLowerCase() === key) ?? artists[0] ?? null;
-      });
-      // une erreur réseau ne doit pas rester en cache
-      cached.catch(() => this.artistCache.delete(key));
-      this.artistCache.set(key, cached);
+      cached = this.call<{ data?: DeezerArtist[] }>("search/artist", { q: name, limit: 10 }).then((resp) => resp.data ?? []);
+      cached.catch(() => this.searchCache.delete(key));
+      this.searchCache.set(key, cached);
     }
     return cached;
   }
 
-  /** Propositions d'artistes pour une saisie partielle (Deezer gère bien les préfixes, Last.fm non). */
-  async suggestArtists(query: string, limit = 6): Promise<Suggestion[]> {
-    const resp = await this.call<{ data?: DeezerArtist[] }>("search/artist", { q: query, limit: 15 });
-    const artists = resp.data ?? [];
-    // pré-remplit le cache de findArtist : choisir une proposition lancera l'extrait sans nouvelle recherche
-    for (const artist of artists) {
-      const key = artist.name.trim().toLowerCase();
-      if (!this.artistCache.has(key)) {
-        this.artistCache.set(key, Promise.resolve(artist));
-      }
+  /**
+   * Artiste Deezer d'après le nom seul : l'homonyme exact le plus écouté, sinon le premier résultat.
+   * Sans vérification : pour un artiste Last.fm, préférer DeezerMatcher (MBID, puis titres en commun).
+   */
+  async findArtist(name: string): Promise<DeezerArtist | null> {
+    const artists = await this.searchArtists(name);
+    return exactMatches(name, artists)[0] ?? artists[0] ?? null;
+  }
+
+  /** Artiste par identifiant Deezer (null s'il n'existe plus). */
+  async getArtist(id: number): Promise<DeezerArtist | null> {
+    try {
+      const artist = await this.call<DeezerArtist>(`artist/${id}`);
+      return artist && artist.id ? artist : null;
+    } catch {
+      return null; // « no data » : identifiant périmé (Wikidata) ; l'appelant se rabat sur le nom
     }
-    return rankSuggestions(query, artists, limit);
+  }
+
+  /**
+   * Propositions d'artistes pour une saisie partielle (Deezer gère bien les préfixes, Last.fm non).
+   * Deezer renvoie beaucoup d'homonymes, regroupés ensuite : on en demande plus que nécessaire.
+   */
+  async suggestArtists(query: string, limit = 20): Promise<Suggestion[]> {
+    const resp = await this.call<{ data?: DeezerArtist[] }>("search/artist", { q: query, limit: 50 });
+    return rankSuggestions(query, resp.data ?? [], limit);
   }
 
   async getTopTracks(artistId: number, limit = 5): Promise<PreviewTrack[]> {

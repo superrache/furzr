@@ -44,14 +44,24 @@ describe("ArtistMap", () => {
     expect(names(map)).toEqual(["Muse", "Placebo", "Radiohead", "Suede"]);
   });
 
-  it("gives the neighborhood of a node to focus on after an expansion", () => {
+  it("gives the neighborhood of a node in both directions", () => {
     const map = new ArtistMap();
     map.addInput(a("Radiohead"), [a("Muse"), a("Blur")], 10);
     map.markExplored("muse");
     map.expand("muse", [a("Placebo"), a("Ash")], 10);
-    // Muse, ses nouveaux similaires et Radiohead d'où l'on vient ; pas le reste du snake
     expect([...map.neighborhood("muse")].sort()).toEqual(["ash", "muse", "placebo", "radiohead"]);
     expect(map.neighborhood("unknown").size).toBe(0);
+  });
+
+  it("focuses on the expanded node and its children only, not the parent", () => {
+    const map = new ArtistMap();
+    map.addInput(a("Radiohead"), [a("Muse"), a("Blur")], 10);
+    map.markExplored("muse");
+    // Radiohead revient parmi les similaires de Muse : il reste le parent, pas un enfant
+    map.expand("muse", [a("Placebo"), a("Ash"), a("Radiohead")], 10);
+    expect([...map.focusSet("muse")].sort()).toEqual(["ash", "muse", "placebo"]);
+    expect([...map.focusSet("radiohead")].sort()).toEqual(["muse", "radiohead"]);
+    expect(map.focusSet("unknown").size).toBe(0);
   });
 
   it("keeps the first input as artist A when other artists are added", () => {

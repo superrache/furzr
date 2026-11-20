@@ -1,10 +1,13 @@
-import type { DeezerClient } from "../api/deezer";
-import type { PreviewTrack } from "../api/types";
+import type { DeezerArtist, DeezerClient } from "../api/deezer";
+import type { Artist, PreviewTrack } from "../api/types";
 
 export interface PreviewStatus {
   state: "off" | "loading" | "playing" | "none" | "unavailable";
   track?: PreviewTrack;
 }
+
+/** Volume par défaut des extraits. */
+export const DEFAULT_VOLUME = 0.7;
 
 /**
  * Lecteur d'extraits : joue à la suite les top titres Deezer de l'artiste courant.
@@ -16,17 +19,26 @@ export class PreviewPlayer {
   private requestId = 0;
   private playlist: PreviewTrack[] = [];
   private cursor = 0;
-  private artistName: string | null = null;
-  private loadedArtist: string | null = null;
+  private artist: Artist | null = null;
+  private loadedArtist: Artist | null = null;
 
   constructor(
     private readonly deezer: DeezerClient,
+    /** Artiste Deezer de l'artiste affiché (DeezerMatcher) : null = pas d'extrait sûr. */
+    private readonly resolve: (artist: Artist) => Promise<DeezerArtist | null>,
     enabled: boolean,
     private readonly onStatus: (status: PreviewStatus) => void,
+    volume = DEFAULT_VOLUME,
   ) {
     this.enabled = enabled;
+    this.setVolume(volume);
     this.audio.preload = "auto";
     this.audio.addEventListener("ended", () => this.next());
+  }
+
+  /** Volume de 0 à 1 (sans effet sur iOS, où seul le volume du système compte). */
+  setVolume(volume: number): void {
+    this.audio.volume = Math.min(1, Math.max(0, Number.isFinite(volume) ? volume : DEFAULT_VOLUME));
   }
 
   get isEnabled(): boolean {
@@ -40,18 +52,18 @@ export class PreviewPlayer {
       this.onStatus({ state: "off" });
       return;
     }
-    if (this.artistName && this.loadedArtist === this.artistName && this.audio.src) {
+    if (this.artist && this.loadedArtist === this.artist && this.audio.src) {
       this.play();
       this.onStatus({ state: "playing", track: this.playlist[this.cursor] });
-    } else if (this.artistName) {
-      void this.load(this.artistName);
+    } else if (this.artist) {
+      void this.load(this.artist);
     }
   }
 
   /** Arrête la lecture et oublie l'artiste courant (carte vidée). */
   stop(): void {
     this.requestId++;
-    this.artistName = null;
+    this.artist = null;
     this.loadedArtist = null;
     this.audio.pause();
     this.audio.removeAttribute("src");
@@ -65,18 +77,18 @@ export class PreviewPlayer {
     }
   }
 
-  async load(artistName: string): Promise<void> {
-    this.artistName = artistName;
+  async load(artist: Artist): Promise<void> {
+    this.artist = artist;
     if (!this.enabled) {
       return;
     }
     const requestId = ++this.requestId;
-    this.loadedArtist = artistName;
+    this.loadedArtist = artist;
     this.audio.pause();
     this.onStatus({ state: "loading" });
     try {
-      const artist = await this.deezer.findArtist(artistName);
-      const tracks = artist ? await this.deezer.getTopTracks(artist.id, 5) : [];
+      const found = await this.resolve(artist);
+      const tracks = found ? await this.deezer.getTopTracks(found.id, 5) : [];
       if (requestId !== this.requestId) {
         return;
       }
